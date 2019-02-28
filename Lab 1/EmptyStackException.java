@@ -1,11 +1,11 @@
-class EmptyStackError extends Exception
+class EmptyStackException extends Exception
 {
    private String message;
    
-   EmptyStackError(){
+   EmptyStackException(){
       this.message = "Cannot pop or peek from an empty stack";
    }
-   EmptyStackError(String message){
+   EmptyStackException(String message){
       this.message = message;
    }
    

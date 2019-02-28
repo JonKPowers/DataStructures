@@ -1,8 +1,8 @@
-class CharStack
+class StringStack
 {
    /**
-   ** The CharStack class provides a stack implementation for the char primitive 
-   ** datatypes, providing standard methods to manipulate the stack. The stack
+   ** The StringStack class provides a stack implementation for String dat types 
+   ** providing standard methods to manipulate the stack. The stack
    ** is implemented using an array, but the array will automatically increase
    ** its size to prevent overflows. The overflow protection cannot be overridden.
    **
@@ -10,38 +10,54 @@ class CharStack
    ** @version 0.1
    **/
    
-   private char[] stack;
+   private String[] stack;
    private int top;
    private final int INITIALSIZE = 20;
    
    // Constructors
-   CharStack(){
-      stack = new char[INITIALSIZE];
+   StringStack(){
+      stack = new String[INITIALSIZE];
       top = -1;
    }
    
-   CharStack(int stackSize){
-      stack = new char[stackSize];
+   StringStack(int stackSize){
+      stack = new String[stackSize];
       top = -1;
    }
    
-   CharStack(String seedString){
+   StringStack(String seedString){
       /**
       ** Takes in a String, which is placed onto the stack during initialization.
       **
       ** @param seedString The String to be used to initialize the stack
       **/
-      stack = new char[seedString.length()];
-      char[] seedArray = seedString.toCharArray();
+      stack = new String[seedString.length()];
+      String[] seedArray = seedString.split("");
       for(int i=0; i<seedString.length(); i++){
          stack[i] = seedArray[i];
       }
       top = seedString.length() - 1;
    }
    
+   StringStack(String seedString, String reverseIt){
+      stack = new String[seedString.length()];
+      String[] seedArray = seedString.split("");
+      if(reverseIt.equals("reverse")) {
+         int j = 0;
+         for(int i=seedString.length() - 1; i>-1; i--){
+            stack[j++] = seedArray[i];
+         }
+      } else {
+         for(int i=0; i<seedString.length(); i++){
+            stack[i] = seedArray[i];
+         }
+      }
+      top = seedString.length() - 1;
+   }
+   
    public boolean isEmpty(){
       /**
-      ** isEmpty() checks whether the CharStack is empty.
+      ** isEmpty() checks whether the StringStack is empty.
       **
       ** @return bool True if the stack is empty; otherwise false.
       **
@@ -70,7 +86,7 @@ class CharStack
       return top + 1;
    }
    
-   public void push(char newChar){
+   public void push(String newItem){
       /**
       ** push() adds an element to the top of the stack. If for any reason, the method encounters
       ** a problem assigning the new element to the correct position in the array, it will print
@@ -78,7 +94,7 @@ class CharStack
       ** is designed to avoid overflows, and thus out of bounds exceptions, you can never
       ** be too careful.
       **s
-      ** @param newChar The character that is to be added to the stack.
+      ** @param newItem The String that is to be added to the stack.
       ** @return None Nothing is returned.
       **
       **/
@@ -88,17 +104,17 @@ class CharStack
       }
       // Add the element to the stack
       try{
-         stack[++top] = newChar;
+         stack[++top] = newItem;
       } catch(ArrayIndexOutOfBoundsException except) {
          System.out.println("Something terrible happened: " + except.getMessage());
       }
    }
    
-   public char pop()throws EmptyStackException{
+   public String pop()throws EmptyStackException{
       /**
       ** pop() removes the top element on the stack and returns it.
       **
-      ** @return char The character that was removed from the top of the stack.
+      ** @return String The item that was removed from the top of the stack.
       ** @throws EmptyStackError On an attempt to call pop() on an empty stack.
       **
       **/
@@ -109,11 +125,11 @@ class CharStack
       return stack[top--];
    }
    
-   public char peek()throws EmptyStackException{
+   public String peek()throws EmptyStackException{
       /**
       ** peek() returns the top element on the stack without removing it.
       **
-      ** @return char The character on the top of the stack.
+      ** @return String The item at the top of the stack.
       ** @throws EmptyStackError On an attempt to call peek() on an empty stack.
       **
       **/
@@ -136,7 +152,7 @@ class CharStack
       ** @return None Nothing is returned.
       **/
       
-      char[] newStack = new char[stack.length * 2];
+      String[] newStack = new String[stack.length * 2];
       
       // Copy the contents of the full array to the new, larger array
       for(int i=0; i<stack.length; i++){
