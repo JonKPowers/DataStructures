@@ -24,11 +24,10 @@ class Lab1PostfixCompiler
          System.out.println("Unable to get data from " + inputFile + ". Please check input file and try again.");
          System.exit(0);
       }
-      
-      System.out.println(fileLines[1]);
-      
-      String converted = convertPostfix("ABC+++");
-      System.out.println(converted);
+
+      String testString = "ABC+/CBA*+";      
+      String converted = convertPostfix(testString);
+      System.out.println(testString + "\n" + converted);
 
    }
 
@@ -47,7 +46,6 @@ class Lab1PostfixCompiler
       */
       
       String a, b;
-      String register = null;
       VarGenerator tempVars = new VarGenerator();
       StringStack operandStack = new StringStack();
       StringStack inputStack = new StringStack(input, "reverse");
@@ -72,15 +70,13 @@ class Lab1PostfixCompiler
                b = operandStack.pop();
                a = operandStack.pop();
                
-               // If the contents of the register don't match a, put a into the register.
-               // THIS MIGHT BE UNNECESSARY--MAYBE JUST ALWAYS PUT IT IN THE REGISTER?
-               if(register == null || !register.equals(a)){
-                  register = a;
-                  loadInstruction = "LD\t" + a + "\n";
-                  outputString += loadInstruction;
-               } else {
-                  loadInstruction = "";
-               }
+               
+               
+               
+               // Put the contents of a into the register. We could skip this step for operations
+               // that are commutative and one of the operands is already in the register. TODO ITEM?
+               loadInstruction = "LD\t" + a + "\n";
+               outputString += loadInstruction;
                
                // Get the operation instruction and perform the operation
                // NEED SPECIAL HANDLING FOR EXPONENTS;
@@ -88,24 +84,48 @@ class Lab1PostfixCompiler
                operationInstruction = instruction + "\t" + b +"\n";
                outputString += operationInstruction;
                
-               // Store the operation results and push back onto the stack
-               String varName = tempVars.getNewVar(loadInstruction, operationInstruction);
-               outputString += "ST\t" + varName + "\n";
-               operandStack.push(varName);            
+               // If there is more input to process, store the operation result; otherwise print the final register contents.
+               // In either case, push the operation's result back onto the stack for error checking purposes.
+               String tmpVar = tempVars.getNewVar();
+               if(inputStack.isEmpty()){
+                  outputString += "Final register contents: " + a + " " + item + " " + b;
+               } else {
+                  outputString += getStorageString(tmpVar);
+               }
+               operandStack.push(tmpVar);
+                       
             } catch(EmptyStackException except) {
                System.out.println("The input string contained too few operands for the expression");
+               outputString = "Expression exception: The input contained too few operands for the expression";
                // NEED SOME SORT OF MESSAGE TO BE WRITTEN TO THE OUTPUT FILE.
                // ERROR HANDLING FOR NOT ENOUGH OPERANDS!            
             }
          }
       }
       
-      if(inputStack.getLength() != 1){
+      if(operandStack.getLength() > 1){
          // There should be exactly one item left on the operand stack, which is the final result.
-         System.out.println("There were too many operatands in this expression.");
+         System.out.println("There were too many operands in this expression.");
+         outputString = "Expression exception: The input contained too many operands for the expression.";
          //ERROR HANDLING FOR TOO MANY OPERANDS!
       }
       return outputString; 
+   }
+
+   public static String processZeroOperand(String a, String b){
+   
+   }
+   
+   public static String processOneOperand(String a, String b){
+   
+   }
+   
+   public static String processStandardOperand(String a, String b){
+   
+   }
+   
+   public static String getStorageString(String varName){
+      return "ST\t" + varName + "\n";
    }
    
    public static String getInstruction(String operator){
@@ -127,4 +147,5 @@ class Lab1PostfixCompiler
    public static boolean isOperator(String item){
       return item.equals("+") || item.equals("-") || item.equals("*") || item.equals("/") || item.equals("$");
    }
+
 }

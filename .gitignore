@@ -1,3 +1,5 @@
 .idea
 *.class
 __pycache__
+test.*
+test/

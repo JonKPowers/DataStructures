@@ -13,4 +13,9 @@ class VarGenerator
       history.put(varNumber, loadInstruction + operationInstruction);
       return "TEMP" + varNumber++;
    }
+   
+   public String getNewVar(){
+      history.put(varNumber, "NONE");
+      return "TEMP" + varNumber++;
+   }
 }
