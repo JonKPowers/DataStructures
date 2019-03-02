@@ -5,7 +5,8 @@ class PostfixConverter
    private String register = null;
    private VarGenerator varGen = new VarGenerator();
    
-   // Constructors
+   // Constructors. By default, optimizations are disabled. They can be enabled by passing true as an argument
+   // to the constructor or by passing the String "optimize" to the constructor.
    PostfixConverter(){
       this.optimize = false;
    }
@@ -45,9 +46,28 @@ class PostfixConverter
      return InstructionString;
    }
    
-   public void processOperation(String a, String b, String instruction){
-      if(!this.optimize){simpleOperation(a, b, instruction);}
-      else {
+   public String processOperation(String a, String b, String instruction){
+      /** processOperation() is the public interface to the operation processing methods in
+      ** PostfixConverter. It chooses the appropriate methods to apply based on whether or
+      ** not optimizations are enabled and returns the name of the temporary variable
+      ** that the operation's result is stored in.
+      **
+      ** @param a A String containing the first operand.
+      ** @param b A String containing the second operand.
+      ** @param instruction A String containing the operator to be applied to the operands.
+      **
+      ** @return String The name of the temporary variable that the operation's result is stored in.
+      **/
+      
+      // Error checking--No division by zero allowed
+      if(b.equals("0") && instruction.equals("/")){
+         throw new ArithmeticException("Division by zero");
+      }
+      
+      // Apply the appropriate operations based on whether optimizations is enabled
+      if(!this.optimize){
+         simpleOperation(a, b, instruction);
+      } else {
          if(a.equals("0") || b.equals("0")){
             zeroOperation(a, b, instruction);
          } else {
@@ -56,6 +76,7 @@ class PostfixConverter
          // TO DO: One operations and commutative operations.
          
       }
+      return storeRegister();
    }  
     
    public void simpleOperation(String a, String b, String instruction){
@@ -71,9 +92,6 @@ class PostfixConverter
       ** @return None Nothing is returned.
       **/
 
-      if(register != null){
-         this.storeRegister();
-      }
       this.machineInstructions.push("LD\t" + a + "\n");
       this.register = a;
       this.machineInstructions.push(getInstructionCode(instruction) + "\t" + b + "\n");
@@ -92,11 +110,10 @@ class PostfixConverter
             if(a.equals("0")){
                //put b directly into register; this covers 0 + 0 as well.
                this.machineInstructions.push("LD\t" + b + "\n");
+               this.register = b;
             } else if(b.equals("0")){
                // a stays or goes into register
-               if(this.register == null){
-                  this.machineInstructions.push("LD\t" + a + "\n");
-               }               
+               setRegister(a);
             }
             break;
          case "-":
@@ -104,7 +121,9 @@ class PostfixConverter
                this.simpleOperation(a, b, instruction);
             } else if(b.equals("0")){
                // a stays in register, so do nothing and continue
+               setRegister(a);
             }
+            break;
          case "*": // Anything multiplied by zero is zero, so put directly into register
             this.machineInstructions.push("LD\t0\n");
             this.register = "0";
@@ -125,8 +144,24 @@ class PostfixConverter
    
    private String storeRegister(){
       String tempVar = varGen.getNewVar();
-      this.machineInstructions.push("ST\t" + tempVar);
+      this.machineInstructions.push("ST\t" + tempVar + "\n");
       return tempVar;
+   }
+   
+   private void setRegister(String value){
+      /** setRegister() makes sure the PostfixConverter's private register to the provided value.
+      ** If the register already contains the desired value, nothing is done; otherwise a LD 
+      ** instruction is added to the machineInstructions, and the internal register tracker is updated.
+      ** 
+      ** @param value The value to set the register to.
+      ** @return None Nothing is returned
+      **/
+      if(this.register == null){
+         this.machineInstructions.push("LD\t" + value + "\n");
+         this.register = value;
+      } else if (!this.register.equals(value)) {
+         this.machineInstructions.push("LD\t" + value + "\n");
+      } 
    }
    
    private String getInstructionCode(String instruction){
