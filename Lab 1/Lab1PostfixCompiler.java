@@ -25,7 +25,7 @@ class Lab1PostfixCompiler
          System.exit(0);
       }
 
-      String testString = "ABC+/CBA*+";      
+      String testString = "CB+AB+0$+";      
       String converted = convertPostfix(testString);
       System.out.println(testString + "\n" + converted);
 
@@ -46,13 +46,12 @@ class Lab1PostfixCompiler
       */
       
       String a, b;
-      VarGenerator tempVars = new VarGenerator();
+      String item = null, outputString = null;
+      PostfixConverter converter = new PostfixConverter(true);
       StringStack operandStack = new StringStack();
       StringStack inputStack = new StringStack(input, "reverse");
-      String outputString = "";
       
       while(!inputStack.isEmpty()){
-         String item = "";
          try {
             item = inputStack.pop();
          } catch (EmptyStackException except) {
@@ -64,35 +63,11 @@ class Lab1PostfixCompiler
          // If it's an operator, try to get two operands and perform the operation
          } else {
             try {
-               String loadInstruction, operationInstruction = null;
-               
                // We need two operands to perform an operation
                b = operandStack.pop();
                a = operandStack.pop();
-               
-               
-               
-               
-               // Put the contents of a into the register. We could skip this step for operations
-               // that are commutative and one of the operands is already in the register. TODO ITEM?
-               loadInstruction = "LD\t" + a + "\n";
-               outputString += loadInstruction;
-               
-               // Get the operation instruction and perform the operation
-               // NEED SPECIAL HANDLING FOR EXPONENTS;
-               String instruction = getInstruction(item);
-               operationInstruction = instruction + "\t" + b +"\n";
-               outputString += operationInstruction;
-               
-               // If there is more input to process, store the operation result; otherwise print the final register contents.
-               // In either case, push the operation's result back onto the stack for error checking purposes.
-               String tmpVar = tempVars.getNewVar();
-               if(inputStack.isEmpty()){
-                  outputString += "Final register contents: " + a + " " + item + " " + b;
-               } else {
-                  outputString += getStorageString(tmpVar);
-               }
-               operandStack.push(tmpVar);
+
+               operandStack.push(converter.processOperation(a, b, item));
                        
             } catch(EmptyStackException except) {
                System.out.println("The input string contained too few operands for the expression");
@@ -109,40 +84,10 @@ class Lab1PostfixCompiler
          outputString = "Expression exception: The input contained too many operands for the expression.";
          //ERROR HANDLING FOR TOO MANY OPERANDS!
       }
-      return outputString; 
-   }
-
-   public static String processZeroOperand(String a, String b){
-   
-   }
-   
-   public static String processOneOperand(String a, String b){
-   
-   }
-   
-   public static String processStandardOperand(String a, String b){
-   
-   }
-   
-   public static String getStorageString(String varName){
-      return "ST\t" + varName + "\n";
-   }
-   
-   public static String getInstruction(String operator){
-      String instruction;
-      switch(operator){
-         case "+":   instruction = "AD";
-                     break;
-         case "-":   instruction = "SB";
-                     break;
-         case "*":   instruction = "ML";
-                     break;
-         case "/":   instruction = "DV";
-                     break;
-         default:    instruction = "ERROR!";
-      }
-      return instruction;    
-   }
+      System.out.println("Standard converter:");
+      System.out.println(converter.getInstructionString());
+      return "";
+   } 
    
    public static boolean isOperator(String item){
       return item.equals("+") || item.equals("-") || item.equals("*") || item.equals("/") || item.equals("$");

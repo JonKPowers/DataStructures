@@ -18,4 +18,8 @@ class VarGenerator
       history.put(varNumber, "NONE");
       return "TEMP" + varNumber++;
    }
+   
+   public String getLastVar(){
+      return "TEMP" + (varNumber - 1);
+   }
 }
