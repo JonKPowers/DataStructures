@@ -12,22 +12,29 @@ class StringStack
    
    private String[] stack;
    private int top;
-   private final int INITIALSIZE = 20;
+   private final int INITIALSIZE = 8;
    
    // Constructors
    StringStack(){
+      /** This constructor provides a stack with an initial size of INITIALSIZE
+      **/
       stack = new String[INITIALSIZE];
       top = -1;
    }
    
    StringStack(int stackSize){
+      /** This constructor provides a stack with an initial size of stackSize
+      **
+      ** @param stackSize The initial size of the new stack.
+      **/
       stack = new String[stackSize];
       top = -1;
    }
    
    StringStack(String seedString){
       /**
-      ** Takes in a String, which is placed onto the stack during initialization.
+      ** This constructor takes in a String, which is placed onto the stack 
+      ** during initialization.
       **
       ** @param seedString The String to be used to initialize the stack
       **/
@@ -39,10 +46,18 @@ class StringStack
       top = seedString.length() - 1;
    }
    
-   StringStack(String seedString, String reverseIt){
+   StringStack(String seedString, boolean reverseIt){
+      /**
+      ** This constructor takes in a String, which is placed onto the stack 
+      ** during initialization. Optionally, the stack can be initialized with
+      ** the string reversed.
+      **
+      ** @param seedString The String to be used to initialize the stack
+      ** @param reverseIt If true, the String will be placed onto the stack in reverse order. 
+      **/
       stack = new String[seedString.length()];
       String[] seedArray = seedString.split("");
-      if(reverseIt.equals("reverse")) {
+      if(reverseIt) {
          int j = 0;
          for(int i=seedString.length() - 1; i>-1; i--){
             stack[j++] = seedArray[i];
@@ -137,7 +152,7 @@ class StringStack
          System.out.println("ERROR: Cannot peek on an empty stack.");
          throw new EmptyStackException();
       }
-      return stack[top - 1];
+      return stack[top];
       
    }
    
@@ -174,6 +189,19 @@ class StringStack
          stackString += stack[i];
       }
       return stackString;
+   }
+   
+   public StringStack copy(){
+      /**
+      ** copy() makes and returns a copy of the current stack in its current state.
+      **
+      ** @return StringStack A copy of the current stack.
+      **/
+      StringStack stackCopy = new StringStack(this.getLength());
+      for(int i=0; i<=this.top; i++){
+         stackCopy.push(this.stack[i]);
+      }
+      return stackCopy;
    }
    
 }

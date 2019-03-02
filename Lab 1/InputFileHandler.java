@@ -70,7 +70,7 @@ class InputFileHandler
       // If an error occurs, an empty array is returned.
       try(BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"))){
          for(int i=0; i<numLines; i++){
-            fileLines[i] = file.readLine();
+            fileLines[i] = file.readLine().trim();
          }
       } catch(IOException except){
          System.out.println("Error reading input file " + fileName + ": " + except.getMessage());
@@ -80,5 +80,39 @@ class InputFileHandler
       return fileLines;
    }
 
+   public static StringStack[] getLinesFromFileAsStacks(String fileName){
+      StringStack[] fileLineStacks = new StringStack[getNumLines(fileName)];
+      
+      try(FileReader file = new FileReader(fileName)){
+         int character;
+         int line = 0;
+         CharStack tempStack = new CharStack();
+         while((character = file.read()) != -1){
+            if(character == '\n') {
+               fileLineStacks[line] = new StringStack();
+               while(!tempStack.isEmpty()){
+                  try{
+                     char[] tempchar = {tempStack.pop()};
+                     fileLineStacks[line].push(new String(tempchar));
+                  } catch (EmptyStackException except) {
+                     System.out.println("This should never happen.");
+                  }
+               }
+               line++;
+               tempStack = new CharStack();
+            } else if(character < 20 || character == 32) {   
+               // Ignore whitespace characters (Any UTF-8 character with unicode 
+               // value under 20 as well as unicode 32, which is a space).
+               continue;
+            } else {
+               tempStack.push((char) character);
+            }
+         }
+      } catch(IOException except){
+         System.out.println("There was an error reading " + fileName + ": " + except.getMessage());
+         System.out.println("Please check that the file exists, that it contains data, and that you have access to it. Try again.");
+      }        
+      return fileLineStacks;
+   }
 
 }

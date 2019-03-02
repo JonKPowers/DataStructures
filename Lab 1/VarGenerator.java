@@ -22,4 +22,8 @@ class VarGenerator
    public String getLastVar(){
       return "TEMP" + (varNumber - 1);
    }
+   
+   public void cancelLastVar(){
+      varNumber--;
+   }
 }

@@ -1,4 +1,4 @@
-class PostfixConverter
+class Compiler
 {
    private boolean optimize;
    private StringStack machineInstructions = new StringStack();
@@ -7,15 +7,15 @@ class PostfixConverter
    
    // Constructors. By default, optimizations are disabled. They can be enabled by passing true as an argument
    // to the constructor or by passing the String "optimize" to the constructor.
-   PostfixConverter(){
+   Compiler(){
       this.optimize = false;
    }
    
-   PostfixConverter(boolean optimize){
+   Compiler(boolean optimize){
       this.optimize = optimize;
    }
    
-   PostfixConverter(String optimize){
+   Compiler(String optimize){
       this.optimize = optimize.equals("optimize");
    }
    
@@ -105,7 +105,6 @@ class PostfixConverter
    }
 
    public void exponentOperation(String a, String b, String instruction) throws ArithmeticException {
-      System.out.println("Hit exponent operation");
       if(!isDigit(b)){
          throw new ArithmeticException("Invalid Expression: Exponent power must be a digit");
       }
@@ -119,10 +118,11 @@ class PostfixConverter
          if(a.equals("0")){
             throw new ArithmeticException("Invalid expression: Zero to the zeroth power is not defined");
          } else {
-            // The last instruction was to set the regsiter to variable a (if not already there). We don't need to do that, so remove
-            // that instruction and place "1" into the register instead.
+            // The last instruction was to store the register's contents. We don't need to do that since we are precomputing the next value,
+            // which equals "1" and which we will put into the register instead.
             try {
                this.machineInstructions.pop();
+               varGen.cancelLastVar();
             } catch (EmptyStackException except) {
                System.out.println("This should never happen, but the compiler made me put this in.");
             }
@@ -219,6 +219,7 @@ class PostfixConverter
    private void commutativeOperation(String a, String b, String instruction) throws EmptyStackException{
       String lastResult = varGen.getLastVar();
       if (b.equals(lastResult)){
+         varGen.cancelLastVar();
          this.machineInstructions.pop();
          this.machineInstructions.push(getInstructionCode(instruction) + "\t" + a + "\n");
       } else {

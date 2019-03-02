@@ -121,7 +121,7 @@ class CharStack
          System.out.println("ERROR: Cannot peek on an empty stack.");
          throw new EmptyStackException();
       }
-      return stack[top - 1];
+      return stack[top];
       
    }
    
