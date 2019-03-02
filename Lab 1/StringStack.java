@@ -70,6 +70,10 @@ class StringStack
       top = seedString.length() - 1;
    }
    
+   //
+   // Public methods
+   //
+   
    public boolean isEmpty(){
       /**
       ** isEmpty() checks whether the StringStack is empty.
@@ -78,17 +82,6 @@ class StringStack
       **
       **/
       return top == -1;
-   }
-   
-   private boolean isFull(){
-      /**
-      ** isFull() checks whether the array containing the stack is full. Used as part
-      ** of the internal overflow-protection implementation.
-      **
-      ** @return bool True if the curreny array is full; otherwise false.
-      **
-      **/
-      return top == (stack.length - 1);
    }
    
    public int getLength() {
@@ -134,7 +127,6 @@ class StringStack
       **
       **/
       if (this.isEmpty()){
-         System.out.println("ERROR: Cannot pop from empty stack.");
          throw new EmptyStackException();
       }
       return stack[top--];
@@ -154,26 +146,6 @@ class StringStack
       }
       return stack[top];
       
-   }
-   
-   private void stretchStack(){
-      /**
-      ** stretchStack() increases the size of the array that holds the stack elements 
-      ** as part of the automatic overflow protection implemented here. It will
-      ** double the length of the current stack array in place. This method is intended to be used
-      ** before adding a new element to the stack if isFull() returns true so that the stack
-      ** doesn't overflow.
-      **
-      ** @return None Nothing is returned.
-      **/
-      
-      String[] newStack = new String[stack.length * 2];
-      
-      // Copy the contents of the full array to the new, larger array
-      for(int i=0; i<stack.length; i++){
-         newStack[i] = stack[i];
-      } 
-      stack = newStack;
    }
    
    public String viewStack() {
@@ -204,4 +176,51 @@ class StringStack
       return stackCopy;
    }
    
+   public void reverse(){
+      /**
+      ** reverse() reverses the contents of the stack in place by swapping
+      ** elements at each end until the middle is reached.
+      ** @return None Nothing is returned.
+      **/
+      for(int i=0; i < top / 2; i++){
+         String temp = stack[i];
+         stack[i] = stack[top - i];
+         stack[top - i] = temp;
+      }
+   }
+   
+   //
+   // Private methods
+   //
+   
+   private boolean isFull(){
+      /**
+      ** isFull() checks whether the array containing the stack is full. Used as part
+      ** of the internal overflow-protection implementation.
+      **
+      ** @return bool True if the curreny array is full; otherwise false.
+      **
+      **/
+      return top == (stack.length - 1);
+   }
+   
+   private void stretchStack(){
+      /**
+      ** stretchStack() increases the size of the array that holds the stack elements 
+      ** as part of the automatic overflow protection implemented here. It will
+      ** double the length of the current stack array in place. This method is intended to be used
+      ** before adding a new element to the stack if isFull() returns true so that the stack
+      ** doesn't overflow.
+      **
+      ** @return None Nothing is returned.
+      **/
+      
+      String[] newStack = new String[stack.length * 2];
+      
+      // Copy the contents of the full array to the new, larger array
+      for(int i=0; i<stack.length; i++){
+         newStack[i] = stack[i];
+      } 
+      stack = newStack;
+   } 
 }

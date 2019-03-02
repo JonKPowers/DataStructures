@@ -2,8 +2,10 @@ class Compiler
 {
    private boolean optimize;
    private StringStack machineInstructions = new StringStack();
+   private StringStack registerContents = new StringStack();
    private String register = null;
    private VarGenerator varGen = new VarGenerator();
+   private int lastStoragePosition, lastOperandToOperatorSwitch;
    
    // Constructors. By default, optimizations are disabled. They can be enabled by passing true as an argument
    // to the constructor or by passing the String "optimize" to the constructor.
@@ -33,17 +35,14 @@ class Compiler
       
       // Reverse the machineInstruction stack to get the instructions in the right
       // order, then concatenate them into a string to return.
-      try {
-         while(!machineInstructions.isEmpty()){
-            reversingStack.push(machineInstructions.pop());
-         }      
-         while(!reversingStack.isEmpty()){
-            InstructionString += reversingStack.pop();
-         }
-      } catch (EmptyStackException except) {
-         System.out.println("This should never happen, but the compiler made me put it in." + except);
+
+      while(!machineInstructions.isEmpty()){
+         reversingStack.push(machineInstructions.pop());
+      }      
+      while(!reversingStack.isEmpty()){
+         InstructionString += reversingStack.pop();
       }
-     return InstructionString;
+      return InstructionString;
    }
    
    public String processOperation(String a, String b, String instruction) throws EmptyStackException{
@@ -61,7 +60,7 @@ class Compiler
       
       // Error checking--No division by zero allowed
       if(b.equals("0") && instruction.equals("/")){
-         throw new ArithmeticException("Division by zero");
+         throw new ArithmeticException("Error in expression: Attempts to divide by zero");
       }
       
       // Apply the appropriate operations based on whether optimizations is enabled
@@ -106,7 +105,7 @@ class Compiler
 
    public void exponentOperation(String a, String b, String instruction) throws ArithmeticException {
       if(!isDigit(b)){
-         throw new ArithmeticException("Invalid Expression: Exponent power must be a digit");
+         throw new ArithmeticException("Exponent power must be a digit");
       }
       
       // If the exponent component is zero, the result will be 1 for all values other than zero. 
@@ -116,16 +115,12 @@ class Compiler
       // 0^0 is undefined, so an ArithmeticException will be thrown if this occurs. 
       if(b.equals("0")){
          if(a.equals("0")){
-            throw new ArithmeticException("Invalid expression: Zero to the zeroth power is not defined");
+            throw new ArithmeticException("Zero to the zeroth power is not defined");
          } else {
             // The last instruction was to store the register's contents. We don't need to do that since we are precomputing the next value,
             // which equals "1" and which we will put into the register instead.
-            try {
-               this.machineInstructions.pop();
-               varGen.cancelLastVar();
-            } catch (EmptyStackException except) {
-               System.out.println("This should never happen, but the compiler made me put this in.");
-            }
+            this.machineInstructions.pop();
+            varGen.cancelLastVar();
             setRegister("1");
          }
       }
@@ -178,7 +173,7 @@ class Compiler
             if(b.equals("0")){
                // Division by zero error should throw an error. This has to be caught by
                // the caller and the output string should reflect the exception.
-               throw new ArithmeticException("Division by zero");               
+               throw new ArithmeticException("Attempts to divide by zero");               
             } else if(a.equals("0")){
                // Zero dived by any value (other than zero) will be zero.
                this.machineInstructions.push("LD\t0\n"); 
@@ -244,7 +239,12 @@ class Compiler
       **/
       if(this.register == null){
          this.machineInstructions.push("LD\t" + value + "\n");
-      } else if (!this.register.equals(value)) {
+      } else if (this.optimize && !this.register.equals(value)) {
+         this.machineInstructions.push("LD\t" + value + "\n");
+      } else if (this.optimize && this.register.equals(value) && value.equals(this.varGen.getLastVar())){
+         this.machineInstructions.pop();
+         this.varGen.cancelLastVar();
+      } else {
          this.machineInstructions.push("LD\t" + value + "\n");
       }
       this.register = value;

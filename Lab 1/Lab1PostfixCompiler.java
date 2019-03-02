@@ -1,3 +1,6 @@
+import java.io.FileWriter;
+import java.io.IOException;
+
 class Lab1PostfixCompiler 
 {
 
@@ -24,6 +27,7 @@ class Lab1PostfixCompiler
       String inputFile, outputFile;
       boolean optimize = false;     // Complier optimization is disabled by default.
       StringStack[] fileLines;
+      StringStack outputStack;
       
       // Parse arguments passed from the command line.
       // There must be at least two (input and output files)
@@ -49,15 +53,37 @@ class Lab1PostfixCompiler
          System.exit(0);
       }
       
-      String testString = "CB+AB+0$+";
-      StringStack testStack = new StringStack(testString, true);
-      
-      System.out.println("Input expression: " + getInputString(testStack.copy()));
-      System.out.println("Optimizations: " + (optimize ? "Enabled" : "Disabled"));      
-      
-      String converted = convertPostfix(testStack, optimize);
-      System.out.println("Compiled instructions:\n" + converted);
+      outputStack = new StringStack(fileLines.length);
+      for(StringStack inputStack : fileLines) {
+         String compiledInstructions;
+         String output = "***********************************\n";
+         output += "***********************************\n";
+         output += "Input expression: " + getInputString(inputStack.copy()) + "\n";
+         try{
+            compiledInstructions = convertPostfix(inputStack, optimize);
+            output += "Optimizations: " +(optimize ? "Enabled" : "Disabled") + "\n";
+            output += "Total compiled instructions: " + "TODO!!!!!\n";
+            output += "Compiled Instructions:\n" + compiledInstructions;
+         } catch (ArithmeticException except){
+            output += "There was a problem with the expression: " + except.getMessage();
+         } catch (ExpressionException except) {
+            output += "There was a problem with the expression: " + except.getMessage();
+         }
+         output += "\n\n\n";
+         outputStack.push(output);
+      }
+      // Since the entries are in reverse order, flip the order of the stack around.
+      outputStack.reverse();
 
+      // Send the program output to the provided outputFile
+      try(FileWriter file = new FileWriter(outputFile)){
+         while(!outputStack.isEmpty()){
+            file.write(outputStack.pop());
+         }
+      } catch (IOException except){
+         System.out.println("There was an error writing the output to " + outputFile + ":");
+         System.out.println(except.getMessage());
+      }
    }
 
    
@@ -80,11 +106,7 @@ class Lab1PostfixCompiler
       StringStack operandStack = new StringStack();
       
       while(!inputStack.isEmpty()){
-         try {
-            item = inputStack.pop();
-         } catch (EmptyStackException except) {
-            System.out.println("This should never happen, but the compiler made me put this in.");
-         }
+         item = inputStack.pop();
          // If the next item is an operand, add it to the operand stack.
          if(!isOperator(item)){
             operandStack.push(item);
@@ -98,17 +120,14 @@ class Lab1PostfixCompiler
                operandStack.push(compiler.processOperation(a, b, item));
                        
             } catch(EmptyStackException except) {
-               System.out.println("The input string contained too few operands for the expression");
-               return "Expression exception: The input contained too few operands for the expression";           
+               throw new ExpressionException("The input contained too few operands for the expression");           
             }
          }
       }
       
       if(operandStack.getLength() > 1){
          // There should be exactly one item left on the operand stack, which is the final result.
-         System.out.println("There were too many operands in this expression.");
-         return "Expression exception: The input contained too many operands for the expression.";
-         
+         throw new ExpressionException("The input contained too many operands for the expression.");         
       }
 
       return compiler.getInstructionString();
@@ -121,11 +140,7 @@ class Lab1PostfixCompiler
    public static String getInputString(StringStack inputStack){
       String inputString = "";
       while(!inputStack.isEmpty()){
-         try {
-            inputString += inputStack.pop();
-         } catch (EmptyStackException except) {
-            System.out.println("This should never happen, but the compiler made me put this in.");
-         }
+         inputString += inputStack.pop();
       }
       return inputString;
    }

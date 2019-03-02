@@ -1,11 +1,12 @@
-class EmptyStackException extends RuntimeException
+class ExpressionException extends RuntimeException
 {
    private String message;
    
-   EmptyStackException(){
+   ExpressionException(){
       this.message = "Cannot pop or peek from an empty stack";
    }
-   EmptyStackException(String message){
+
+   ExpressionException(String message){
       this.message = message;
    }
    
