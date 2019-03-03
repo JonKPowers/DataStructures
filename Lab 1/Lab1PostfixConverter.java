@@ -1,7 +1,7 @@
 import java.io.FileWriter;
 import java.io.IOException;
 
-class Lab1PostfixCompiler 
+class Lab1PostfixConverter 
 {
 
    public static void main ( String[] args ) throws EmptyStackException
@@ -34,7 +34,7 @@ class Lab1PostfixCompiler
       if (args.length < 2){
          System.out.println("Incorrect number of arguments (" + args.length + 
                             ") provided. Usage: Lab1PostfixCompiler <input_file.txt> <output_file.txt> [optimize]");
-         return;
+         System.exit(0);
       }
       
       inputFile = args[0];
@@ -49,10 +49,11 @@ class Lab1PostfixCompiler
       // so print a message and end the program.
       fileLines = InputFileHandler.getLinesFromFileAsStacks(inputFile);
       if(fileLines.length == 0){
-         System.out.println("Unable to get data from " + inputFile + ". Please check input file and try again.");
+         System.out.println("Unable to get data from " + inputFile + ". Please check the input file and try again.");
          System.exit(0);
       }
       
+      // Process each input and build up outputs
       outputStack = new StringStack(fileLines.length);
       for(StringStack inputStack : fileLines) {
          String compiledInstructions;
@@ -72,8 +73,8 @@ class Lab1PostfixCompiler
          output += "\n\n\n";
          outputStack.push(output);
       }
-      // Since the entries are in reverse order, flip the order of the stack around.
-      outputStack.reverse();
+      // Output  entries are in reverse order, so flip the order of the stack around.
+      outputStack.reverse(); 
 
       // Send the program output to the provided outputFile
       try(FileWriter file = new FileWriter(outputFile)){

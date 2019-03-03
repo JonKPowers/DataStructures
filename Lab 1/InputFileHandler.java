@@ -81,6 +81,12 @@ class InputFileHandler
    }
 
    public static StringStack[] getLinesFromFileAsStacks(String fileName){
+   /**
+   ** getLinesFromFileAsStacks() generates an array of StringStacks, with each
+   ** StringStack containing one line of the inputfile, which will pop off from
+   ** left to right. 
+   **
+   **/
       StringStack[] fileLineStacks = new StringStack[getNumLines(fileName)];
       
       try(FileReader file = new FileReader(fileName)){
@@ -88,15 +94,14 @@ class InputFileHandler
          int line = 0;
          CharStack tempStack = new CharStack();
          while((character = file.read()) != -1){
-            if(character == '\n') {
+            if(character == '#'){
+               // Lines beginning with # are comments. Skip those lines
+               while(file.read() != '\n'){}
+            } else if(character == '\n' && !tempStack.isEmpty()) {
                fileLineStacks[line] = new StringStack();
                while(!tempStack.isEmpty()){
-                  try{
-                     char[] tempchar = {tempStack.pop()};
-                     fileLineStacks[line].push(new String(tempchar));
-                  } catch (EmptyStackException except) {
-                     System.out.println("This should never happen.");
-                  }
+                  char[] tempchar = {tempStack.pop()};
+                  fileLineStacks[line].push(new String(tempchar));
                }
                line++;
                tempStack = new CharStack();
@@ -111,8 +116,16 @@ class InputFileHandler
       } catch(IOException except){
          System.out.println("There was an error reading " + fileName + ": " + except.getMessage());
          System.out.println("Please check that the file exists, that it contains data, and that you have access to it. Try again.");
-      }        
-      return fileLineStacks;
+      }
+      
+      // A file consisting only of comments would result in an array of null StringStacks. 
+      // If all are null, return an empty array.
+      for(StringStack stack : fileLineStacks){
+         if(stack != null){
+            return fileLineStacks;
+         }
+      }
+      return new StringStack[0];
    }
 
 }
