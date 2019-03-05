@@ -47,10 +47,15 @@ class InputFileHandler
 
    public static StringStackDataPack[] getLinesFromFileAsStacks(String fileName){
       /**
-      ** getLinesFromFileAsStacks() generates an array of StringStacks, with each
-      ** StringStack containing one line of the inputfile, which will pop off from
-      ** left to right. 
+      ** getLinesFromFileAsStacks() generates an array of StringStackDataPacks, 
+      ** which each contain one postfix expression from the input file along
+      ** with any provided metadata associated with that expression. The postfix
+      ** expressions are contained in StringStacks that will pop off the expression
+      ** from left to right. 
       **
+      ** @param fileName The name of the input file.
+      **
+      ** @return StringStackDataPack[] The array of StringStackDataPacks, one for each expression in the input file.
       **/
       StringStackDataPack[] fileData = new StringStackDataPack[getNumLines(fileName)];
       

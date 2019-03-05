@@ -21,3 +21,14 @@ AB+0$
 # Raise zero to the zeroth power
 >Zero raised to the zeroth power is not defined and will raise an error.
 AB+0*0$
+
+# Raise to the first power
+>Raising something to the 1st power leaves it unchanged.
+>OptimizeOn
+AB+1$
+
+
+>Raising something to the 1st power leaves it unchanged. When optimizations
+> are off, a number of superfluous instructions are generated.
+>OptimizeOff
+AB+1$

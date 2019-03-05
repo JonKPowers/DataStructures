@@ -1,0 +1,50 @@
+# This file contains examples demonstrating the zero-based optimizations
+
+# Addition
+>Addition: Adding zero should not change the value.
+>OptimizeOff
+AB+0+
+
+>Addition: With optimizations on, the AD and intermediate ST/LD is skipped.
+>OptimizeOn
+AB+0+
+
+>Addition: Adding a value to zero should result in that value.
+>OptimizeOff
+0AB++
+
+>Addition: With optimizations on, we go directly to that value 
+>OptimizeOn
+0AB++
+
+>Subtraction: Subtracting zero from a number should not change the value
+>OptimizeOff
+AB*0-
+
+>Subtraction: With optimizations on, we skip the operation.
+>OptimizeOn
+AB*0-
+
+>Multiplication: This expression should reduce to zero.
+>OptimizeOff
+AB+0*
+
+>Multiplication: With optimizations on, it does.
+>OptimizeOn
+AB+0*
+
+>Division: Zero divded by a number should equal zero
+>OptimizeOff
+0AB*/
+
+>Division: With optimizations on, we go directly to zero (mostly).
+>OptimizeOn
+0AB*/
+
+>Division: Division by zero is undefined and will result in a rejected expression
+>OptimizeOff
+ABC*+0/
+
+>Division: This is true whether or not optimizations are enabled.
+>OptimizeOn
+ABC*+0/

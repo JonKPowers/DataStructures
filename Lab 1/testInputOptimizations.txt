@@ -19,3 +19,11 @@ ABC*+DE-/
 >The same example takes 10 instructions when optimizations are enabled.
 >OptimizeOn
 ABC*+DE-/
+
+>The mix of operators can make a big difference.
+>OptimizeOff
+ABC*+DE-*
+
+>The mix of operators can make a big difference.
+>OptimizeOn
+ABC*+DE-*

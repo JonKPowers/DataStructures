@@ -7,18 +7,36 @@ class Compiler
    private String register = null;
    private VarGenerator varGen = new VarGenerator();
    private int lastStoragePosition, lastOperandToOperatorSwitch;
-   
+
+   ////////////////////////////
    // Constructors. By default, optimizations are disabled. They can be enabled by passing true as an argument
    // to the constructor or by passing the String "optimize" to the constructor.
+   ////////////////////////////
    Compiler(){
+      /**
+      ** Base constructor. By default, optimizations are disabled.
+      **
+      **/
       this.optimize = false;
    }
    
    Compiler(boolean optimize){
+      /**
+      ** Constructor with optimization flag. If the boolean true is passed to this constructor, 
+      ** optimizations will be enabled in the Compiler.
+      **
+      ** @param optimize Boolean indicating whether to enable optimizations.
+      **/
       this.optimize = optimize;
    }
    
    Compiler(String optimize){
+      /**
+      ** Constructor with optimization flag. If the String "optimize" is passed to this constructor, 
+      ** optimizations will be enabled in the Compiler.
+      **
+      ** @param optimize Enables Compiler optimizations if "optimzed" is passed; otherwise they are disabled.
+      **/
       this.optimize = optimize.equals("optimize");
    }
    
@@ -88,10 +106,23 @@ class Compiler
    }
    
    public int getNumOfInstructions(){
+      /**
+      ** getNumOfInstructions() determines the number of instructions that have been generated
+      ** to process the input expressions up to the point of the call. Determind from the length
+      ** of the internal machineInstructions stack.
+      **
+      ** @return int The number of machine instructions generated.
+      **/
       return this.machineInstructions.getLength();
    }
    
    public boolean isOptimized(){
+      /**
+      ** isOptimized() determines whether the Compiler has been instantiated 
+      ** with optimizations enabled.
+      **
+      ** @return boolean True is optimizations have been enabled; otherwise false.
+      **/   
       return this.optimize;
    }
    
@@ -109,6 +140,10 @@ class Compiler
       ** The contents of the register are stored to a temporary variable before
       ** the new operation is performed.
       **
+      ** @param a A String containing the first operand.
+      ** @param b A String containing the second operand.
+      ** @param instruction A String containing the operator.
+      **
       ** @return None Nothing is returned.
       **/
 
@@ -121,6 +156,16 @@ class Compiler
    }
 
    private void exponentOperation(String a, String b, String instruction) throws ArithmeticException {
+      /**
+      ** exponentOperation() provides routines to process limited exponentiation operations.
+      **
+      ** @param a A String containing the first operand.
+      ** @param b A String containing the second operand.
+      ** @param instruction A String containing the operator.
+      **
+      ** @throws ArithmeticException Thrown if the exponent provided is not a digit 0-9.
+      **
+      **/
       if(!isDigit(b)){
          throw new ArithmeticException("Exponent power must be a digit");
       }
@@ -134,7 +179,7 @@ class Compiler
          if(a.equals("0")){
             throw new ArithmeticException("Zero to the zeroth power is not defined");
          } else {
-         rollbackStoreAndLoadOperation(a);
+            rollbackStoreAndLoadOperation(a);
             setRegister("1");
          }
       }
@@ -164,7 +209,6 @@ class Compiler
          case "+":
             if(a.equals("0")){
                //put b directly into register; this covers 0 + 0 as well.
-               addInstruction("LD", b);
                setRegister(b);
             } else if(b.equals("0")){
                // a stays or goes into register
@@ -180,7 +224,7 @@ class Compiler
             }
             break;
          case "*": // Anything multiplied by zero is zero, so put directly into register
-            rollbackStoreOperation(a);
+            rollbackStoreOperation(a); //Eliminate redundant ST operation
             setRegister("0");
             break;
          case "/":
@@ -225,6 +269,15 @@ class Compiler
    }
    
    private void commutativeOperation(String a, String b, String instruction) throws EmptyStackException{
+      /** commutativeOperation() provides optimizations for addition and multiplication operations,
+      ** which can result in fewer machine instructions being produced to evaluate the expression.
+      **
+      ** @param a A String containing the first operand.
+      ** @param b A String containing the second operand.
+      ** @param instruction A String containing the operator.
+      **
+      ** @return None Nothing is returned.
+      **/
       String lastResult = varGen.getLastVar();
       if (b.equals(lastResult)){
          varGen.cancelLastVar();
@@ -236,14 +289,31 @@ class Compiler
    }
    
    private void addInstruction(String instruction, String operand){
+      /**
+      ** addInstruction() pushes an new machine instruction string onto the machineInstructions
+      ** stack. It also adds a record of the instruction used to the InstructionHistory stack,
+      ** which is used by certain optimization routines.
+      **
+      ** @param instruction The machine instruction String
+      ** @param operand The operand to apply to the machine instruction.
+      **/
       this.instructionHistory.push(instruction);
       this.machineInstructions.push(instruction + "\t" + operand + "\n");
    }
    
-   private void rollbackStoreOperation(String OperandA){
+   private void rollbackStoreOperation(String operandA){
+      /** 
+      ** rollbackStoreOperation() is an optimization routine that will remove a
+      ** ST instruction and the temporary variable associated with that instruction
+      ** if the value being used as operand a is the value that was previously stored
+      ** since it is already in the register and didn't need an intermediate storage
+      ** step to continue the evaluation.
+      **
+      ** @param operandA The value being used as Operand A in the current expression.
+      **/
       String lastOp = this.instructionHistory.peek();
       String lastVar = this.varGen.getLastVar();
-      if(lastOp.equals("ST") && lastVar.equals(OperandA)){
+      if(lastOp.equals("ST") && lastVar.equals(operandA)){
          this.machineInstructions.pop();
          this.instructionHistory.pop();
          this.varGen.cancelLastVar();
@@ -251,6 +321,20 @@ class Compiler
    }
    
    private void rollbackStoreAndLoadOperation(String OperandA){
+      /** 
+      ** rollbackStoreAndLoadOperation() is an optimization routine that will remove a
+      ** ST-LD instruction and the temporary variable associated with those instructions
+      ** if the value being used as operand a is the value that was previously stored and
+      ** reloaded since it is already in the register and didn't need an intermediate storage
+      ** step to continue the evaluation. For example, if the value x is in the register and
+      ** we are now evaluating x + y, it is not necessary after computing x to have 
+      ** ST TEMP1 and LD TEMP1 before the AD Y instruction. This routine removes the ST and LD
+      ** instructions.
+      **
+      ** @param operandA The value being used as Operand A in the current expression.
+      **
+      ** @return None Nothing is returned
+      **/
       String lastOp1 = this.instructionHistory.pop();
       String lastOp2 = this.instructionHistory.peek();
       String lastVar = this.varGen.getLastVar();
@@ -265,6 +349,15 @@ class Compiler
    }
    
    private String storeRegister(){
+      /**
+      ** storeRegister() generates machine instructions to store the contents of the 
+      ** register to a temporary variable and returns the name of the variable to be
+      ** pushed onto the operand stack. If the register contents are "1" or "0", those
+      ** values are returned directly and not stored in a temporary variable; this is
+      ** done to facilitate certain optimization routines.
+      **
+      ** @return String The name of the temporary variable the register contents are stored in or "0" or "1" if no variable is used.
+      **/
       if(this.register == "0" || this.register == "1"){
          return this.register;
       } else {
@@ -281,6 +374,7 @@ class Compiler
       ** instruction is added to the machineInstructions, and the internal register tracker is updated.
       ** 
       ** @param value The value to set the register to.
+      **
       ** @return None Nothing is returned
       **/
       if(this.register == null){
@@ -300,6 +394,14 @@ class Compiler
    }
    
    private String getInstructionCode(String instruction){
+      /**
+      ** getInstructionCode() provides a translation between an operator symbol 
+      ** and the associated machine instruction code.
+      **
+      ** @param instruction A String containing the operator symbol, e.g., "+" or "*".
+      **
+      ** @return String A String containing the machine instruction code associated with the operator.
+      **/
       String instructionCode;
       switch(instruction){
          case "+":   instructionCode = "AD";
@@ -316,11 +418,28 @@ class Compiler
    }
    
    private boolean isDigit(String num){
+      /**
+      ** isDigit() determines whether an input character is a digit 0-9.
+      **
+      ** @param num A String containing the character to be evaluated.
+      **
+      ** @return boolean True is the input character is a digit 0-9; otherwise false.
+      **
+      **/
       return num.equals("0") || num.equals("1") || num.equals("2") || num.equals("3") || num.equals("4") || 
                num.equals("5") || num.equals("6") || num.equals("7") || num.equals("8") || num.equals("9");
    }
    
    private int getDigit(String num){
+      /**
+      ** getDigit() converts a String digit to its corresponding integer. A verbose and
+      ** less functional version of the library functions Integer.parseInt() or Integer.valueOf().
+      **
+      ** @param num A String containing the digit to convert.
+      **
+      ** @return int The integer value of the digit provided.
+      **
+      **/
       switch(num){
          case "0": return 0;
          case "1": return 1;
