@@ -3,6 +3,7 @@ class Compiler
    private boolean optimize;
    private StringStack machineInstructions = new StringStack();
    private StringStack registerContents = new StringStack();
+   private StringStack instructionHistory = new StringStack();
    private String register = null;
    private VarGenerator varGen = new VarGenerator();
    private int lastStoragePosition, lastOperandToOperatorSwitch;
@@ -21,7 +22,10 @@ class Compiler
       this.optimize = optimize.equals("optimize");
    }
    
+   ////////////////////////////
    // Public methods
+   ////////////////////////////
+   
    public String getInstructionString(){
      /**
      ** getInstructions() returns the machine instructions generated as of 
@@ -31,13 +35,14 @@ class Compiler
      **/
      
       String InstructionString = "";
+      StringStack tempCopy = machineInstructions.copy();
       StringStack reversingStack = new StringStack(machineInstructions.getLength());
       
       // Reverse the machineInstruction stack to get the instructions in the right
       // order, then concatenate them into a string to return.
 
-      while(!machineInstructions.isEmpty()){
-         reversingStack.push(machineInstructions.pop());
+      while(!tempCopy.isEmpty()){
+         reversingStack.push(tempCopy.pop());
       }      
       while(!reversingStack.isEmpty()){
          InstructionString += reversingStack.pop();
@@ -80,9 +85,21 @@ class Compiler
          }
       }
       return storeRegister();
-   }  
+   }
+   
+   public int getNumOfInstructions(){
+      return this.machineInstructions.getLength();
+   }
+   
+   public boolean isOptimized(){
+      return this.optimize;
+   }
+   
+   ////////////////////////////
+   // Private methods
+   ////////////////////////////  
     
-   public void simpleOperation(String a, String b, String instruction){
+   private void simpleOperation(String a, String b, String instruction){
       /**
       ** simpleOperation() converts a simple A-operation-B pattern to machine code.
       ** Operand a is loaded into the register, then the operation is applied to the
@@ -99,11 +116,11 @@ class Compiler
       if(instruction.equals("$")){
          exponentOperation(a, b, instruction);
       } else {
-         this.machineInstructions.push(getInstructionCode(instruction) + "\t" + b + "\n");
+         addInstruction(getInstructionCode(instruction), b);
       }
    }
 
-   public void exponentOperation(String a, String b, String instruction) throws ArithmeticException {
+   private void exponentOperation(String a, String b, String instruction) throws ArithmeticException {
       if(!isDigit(b)){
          throw new ArithmeticException("Exponent power must be a digit");
       }
@@ -117,10 +134,7 @@ class Compiler
          if(a.equals("0")){
             throw new ArithmeticException("Zero to the zeroth power is not defined");
          } else {
-            // The last instruction was to store the register's contents. We don't need to do that since we are precomputing the next value,
-            // which equals "1" and which we will put into the register instead.
-            this.machineInstructions.pop();
-            varGen.cancelLastVar();
+         rollbackStoreAndLoadOperation(a);
             setRegister("1");
          }
       }
@@ -129,12 +143,12 @@ class Compiler
       // be in the register at this point (so we start with a^1 already computed).
       int exponent = getDigit(b);
       for(int i=1; i<exponent; i++){
-         this.machineInstructions.push("ML\t" + a + "\n");
+         addInstruction("ML", a);
       }
    }
 
    
-   public void zeroOperation(String a, String b, String instruction){
+   private void zeroOperation(String a, String b, String instruction){
       /**
       ** zeroOperation() provides some optimized instructions for operations that have
       ** the value zero (as a String) as one of its operands. The instructions generated
@@ -150,7 +164,7 @@ class Compiler
          case "+":
             if(a.equals("0")){
                //put b directly into register; this covers 0 + 0 as well.
-               this.machineInstructions.push("LD\t" + b + "\n");
+               addInstruction("LD", b);
                setRegister(b);
             } else if(b.equals("0")){
                // a stays or goes into register
@@ -166,7 +180,7 @@ class Compiler
             }
             break;
          case "*": // Anything multiplied by zero is zero, so put directly into register
-            this.machineInstructions.push("LD\t0\n");
+            rollbackStoreOperation(a);
             setRegister("0");
             break;
          case "/":
@@ -176,7 +190,6 @@ class Compiler
                throw new ArithmeticException("Attempts to divide by zero");               
             } else if(a.equals("0")){
                // Zero dived by any value (other than zero) will be zero.
-               this.machineInstructions.push("LD\t0\n"); 
                setRegister("0") ;
             }
             break;
@@ -216,17 +229,50 @@ class Compiler
       if (b.equals(lastResult)){
          varGen.cancelLastVar();
          this.machineInstructions.pop();
-         this.machineInstructions.push(getInstructionCode(instruction) + "\t" + a + "\n");
+         addInstruction(getInstructionCode(instruction), a);
       } else {
          simpleOperation(a, b, instruction);
       }
    }
    
+   private void addInstruction(String instruction, String operand){
+      this.instructionHistory.push(instruction);
+      this.machineInstructions.push(instruction + "\t" + operand + "\n");
+   }
+   
+   private void rollbackStoreOperation(String OperandA){
+      String lastOp = this.instructionHistory.peek();
+      String lastVar = this.varGen.getLastVar();
+      if(lastOp.equals("ST") && lastVar.equals(OperandA)){
+         this.machineInstructions.pop();
+         this.instructionHistory.pop();
+         this.varGen.cancelLastVar();
+      }
+   }
+   
+   private void rollbackStoreAndLoadOperation(String OperandA){
+      String lastOp1 = this.instructionHistory.pop();
+      String lastOp2 = this.instructionHistory.peek();
+      String lastVar = this.varGen.getLastVar();
+      if(lastOp1.equals("LD") && lastOp2.equals("ST") && lastVar.equals(OperandA)){
+         this.machineInstructions.pop();  // Remove LD instruction
+         this.machineInstructions.pop();  // Remove ST instruction
+         this.instructionHistory.pop();   // Remove ST history item (LD was removed and put in lastOp1
+         this.varGen.cancelLastVar();     // Rollback the variable counter
+      } else {
+         this.instructionHistory.push(lastOp1); //Put back the instruction we put into lastOp1
+      }
+   }
+   
    private String storeRegister(){
-      String tempVar = varGen.getNewVar();
-      this.machineInstructions.push("ST\t" + tempVar + "\n");
-      this.register = tempVar;
-      return tempVar;
+      if(this.register == "0" || this.register == "1"){
+         return this.register;
+      } else {
+         String tempVar = varGen.getNewVar();
+         addInstruction("ST", tempVar);
+         this.register = tempVar;
+         return tempVar;
+      }
    }
    
    private void setRegister(String value){
@@ -238,14 +284,17 @@ class Compiler
       ** @return None Nothing is returned
       **/
       if(this.register == null){
-         this.machineInstructions.push("LD\t" + value + "\n");
+         addInstruction("LD", value);
       } else if (this.optimize && !this.register.equals(value)) {
-         this.machineInstructions.push("LD\t" + value + "\n");
+         addInstruction("LD", value);
       } else if (this.optimize && this.register.equals(value) && value.equals(this.varGen.getLastVar())){
+         // Don't load a value that we just stored; and if we just stored it, then it's already in the register.
+         // If we're about to use that value again as the first operand, we don't need to waste a temporary
+         // variable storing it.
          this.machineInstructions.pop();
          this.varGen.cancelLastVar();
       } else {
-         this.machineInstructions.push("LD\t" + value + "\n");
+         addInstruction("LD", value);
       }
       this.register = value;
    }

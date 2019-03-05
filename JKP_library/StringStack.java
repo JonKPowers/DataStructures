@@ -182,7 +182,7 @@ class StringStack
       ** elements at each end until the middle is reached.
       ** @return None Nothing is returned.
       **/
-      for(int i=0; i < (top + 1) / 2; i++){
+      for(int i=0; i < top / 2; i++){
          String temp = stack[i];
          stack[i] = stack[top - i];
          stack[top - i] = temp;

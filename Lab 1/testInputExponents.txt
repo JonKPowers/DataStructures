@@ -1,0 +1,23 @@
+# This file contains tests related to Lab1PostfixConverter's handling
+# of exponents. It will only handle expressions where the exponent
+# is a digit 0-9. Attempting to raise to the power of a variable
+# will result in a rejected expression.
+
+# Simple exponent
+>OptimizeOn
+>When the exponent operand is a digit 0-9, the compiler will treat the
+> digit as an integer and will apply a naive exponentiation.
+AB+4$
+
+# Illegal expression
+>This expression returns an error because the exponent is not a digit.
+AB+C$
+
+# Raise to the zeroth power
+>OptimizeOff
+>A value raised to the zeroth power is one.
+AB+0$
+
+# Raise zero to the zeroth power
+>Zero raised to the zeroth power is not defined and will raise an error.
+AB+0*0$

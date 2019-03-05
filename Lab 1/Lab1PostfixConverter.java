@@ -26,7 +26,7 @@ class Lab1PostfixConverter
 
       String inputFile, outputFile;
       boolean optimize = false;     // Complier optimization is disabled by default.
-      StringStack[] fileLines;
+      StringStackDataPack[] fileData;
       StringStack outputStack;
       
       // Parse arguments passed from the command line.
@@ -47,33 +47,36 @@ class Lab1PostfixConverter
       // zero-length array, either the file was empty or there was some sort of issue opening
       // or reading the file. In either case, we don't have any usable data from the inputFile,
       // so print a message and end the program.
-      fileLines = InputFileHandler.getLinesFromFileAsStacks(inputFile);
-      if(fileLines.length == 0){
+      fileData = InputFileHandler.getLinesFromFileAsStacks(inputFile);
+      if(fileData.length == 0){
          System.out.println("Unable to get data from " + inputFile + ". Please check the input file and try again.");
          System.exit(0);
       }
       
       // Process each input and build up outputs
-      outputStack = new StringStack(fileLines.length);
-      for(StringStack inputStack : fileLines) {
-         String compiledInstructions;
-         String output = "***********************************\n";
-         output += "***********************************\n";
-         output += "Input expression: " + getInputString(inputStack.copy()) + "\n";
-         try{
-            compiledInstructions = convertPostfix(inputStack, optimize);
-            output += "Optimizations: " +(optimize ? "Enabled" : "Disabled") + "\n";
-            output += "Total compiled instructions: " + "TODO!!!!!\n";
-            output += "Compiled Instructions:\n" + compiledInstructions;
-         } catch (ArithmeticException except){
-            output += "There was a problem with the expression: " + except.getMessage();
-         } catch (ExpressionException except) {
-            output += "There was a problem with the expression: " + except.getMessage();
+      outputStack = new StringStack(fileData.length);
+      for(StringStackDataPack lineData : fileData) {
+         if(lineData == null){continue;}
+         
+         // Initialize compiler based on settings from input file, if any
+         Compiler compiler;
+         if(lineData.optimizeOn && lineData.optimizeOff){
+            /*Something is wrong if these are both true, so ignore them and use user-selected setting*/
+            compiler = new Compiler(optimize);
          }
-         output += "\n\n\n";
+         else if(lineData.optimizeOn){
+            compiler = new Compiler(true);
+         } else if(lineData.optimizeOff){
+            compiler = new Compiler(false);
+         } else {
+            compiler = new Compiler(optimize);
+         }
+         
+
+         String output = generateOutput(lineData, compiler);
          outputStack.push(output);
       }
-      // Output  entries are in reverse order, so flip the order of the stack around.
+      // Output entries are in reverse order, so flip the order of the stack around.
       outputStack.reverse(); 
 
       // Send the program output to the provided outputFile
@@ -86,9 +89,35 @@ class Lab1PostfixConverter
          System.out.println(except.getMessage());
       }
    }
+   
+   public static String generateOutput (StringStackDataPack lineData, Compiler compiler){
+         String compiledInstructions;
+         StringStack inputStack = lineData.stack;
+         
+         
+         String output = "***********************************\n";
+         output += "***********************************\n";
+         output += "Input expression: " + getInputString(inputStack.copy()) + "\n";
+         if(lineData.comments.length() > 0){
+               output += "Comments: " + lineData.comments + "\n";
+            }
+         try{
+            compiledInstructions = convertPostfix(inputStack, compiler);
+            output += "Optimizations: " +(compiler.isOptimized() ? "Enabled" : "Disabled") + "\n";
+            output += "Total compiled instructions: " + compiler.getNumOfInstructions() + "\n";
+
+            output += "Compiled Instructions:\n" + compiledInstructions;
+         } catch (ArithmeticException except){
+            output += "There was a problem with the expression: " + except.getMessage();
+         } catch (ExpressionException except) {
+            output += "There was a problem with the expression: " + except.getMessage();
+         }
+         output += "\n\n\n";
+         return output;
+   }
 
    
-   public static String convertPostfix (StringStack inputStack, boolean optimize) {
+   public static String convertPostfix (StringStack inputStack, Compiler compiler) {
       /**
       ** convertPostfix() is the workhorse method that converts the postfix string
       ** into machine instructions. It utilizes several stacks to track its position in
@@ -103,7 +132,6 @@ class Lab1PostfixConverter
       
       String a, b;
       String item = null;
-      Compiler compiler = new Compiler(optimize);
       StringStack operandStack = new StringStack();
       
       while(!inputStack.isEmpty()){

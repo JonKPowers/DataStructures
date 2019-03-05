@@ -1,0 +1,21 @@
+# These examples show some of the benefits achieved when optimizations
+# are enabled.
+
+>This example requires 6 instructions when optimizations are
+> turned off.
+>OptimizeOff
+ABC++
+
+>This same expression requires only 4 instructions when optimizations
+> are enabled.
+>OptimizeOn
+ABC++
+
+>This example from the Lab 1 assignment takes 12 instructions
+> without optimizations enabled.
+>OptimizeOff
+ABC*+DE-/
+
+>The same example takes 10 instructions when optimizations are enabled.
+>OptimizeOn
+ABC*+DE-/

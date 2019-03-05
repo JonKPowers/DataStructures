@@ -34,84 +34,87 @@ class InputFileHandler
       //Error handling:
       } catch(FileNotFoundException except) {
          System.out.println("File (" + fileName + ") not found.");
-         return -1;
+         return 0;
       } catch(SecurityException except) {
          System.out.println("Error accessing " + fileName+ ": " + except + ". Do you have read access?");
-         return -1;
+         return 0;
       } catch(IOException except) {
          System.out.println("Error reading input file: " + except + "--no input data retrieved.");
-         return -1;
+         return 0;
       }
       
    }
 
-   public static String[] getLinesFromFile(String fileName){
+   public static StringStackDataPack[] getLinesFromFileAsStacks(String fileName){
       /**
-      ** getLinesFromFile generates an array with each element corresponding to a line
-      ** in fileName. Returns a zero-length array if the file is empty or an error is encountered 
-      ** while attempting to open or read the file.
+      ** getLinesFromFileAsStacks() generates an array of StringStacks, with each
+      ** StringStack containing one line of the inputfile, which will pop off from
+      ** left to right. 
       **
-      ** @param fileName A String containing the name of the input file
-      ** @return String[] An array with each element containing the content of one line of fileName
       **/
-      String[] fileLines;
-      int numLines = getNumLines(fileName);
-      // System.out.println(numLines + " lines in file " + fileName +"."); 
-      
-      // Return an empty array if the source file is empty.
-      if(numLines < 1){
-         return new String[0];
-      }
-      else{
-         fileLines = new String[numLines];
-      }
-      
-      // Otherwise, return an array with the contents of each line.
-      // If an error occurs, an empty array is returned.
-      try(BufferedReader file = new BufferedReader(new InputStreamReader(new FileInputStream(fileName), "UTF-8"))){
-         for(int i=0; i<numLines; i++){
-            fileLines[i] = file.readLine().trim();
-         }
-      } catch(IOException except){
-         System.out.println("Error reading input file " + fileName + ": " + except.getMessage());
-         return new String[0];
-      }
-      
-      return fileLines;
-   }
-
-   public static StringStack[] getLinesFromFileAsStacks(String fileName){
-   /**
-   ** getLinesFromFileAsStacks() generates an array of StringStacks, with each
-   ** StringStack containing one line of the inputfile, which will pop off from
-   ** left to right. 
-   **
-   **/
-      StringStack[] fileLineStacks = new StringStack[getNumLines(fileName)];
+      StringStackDataPack[] fileData = new StringStackDataPack[getNumLines(fileName)];
       
       try(FileReader file = new FileReader(fileName)){
          int character;
          int line = 0;
          CharStack tempStack = new CharStack();
+         String comments = "";
+         boolean optimizeOn = false;
+         boolean optimizeOff = false;
+         
+         
          while((character = file.read()) != -1){
+            // Lines beginning with # are comments. Skip those lines
             if(character == '#'){
-               // Lines beginning with # are comments. Skip those lines
                while(file.read() != '\n'){}
-            } else if(character == '\n' && !tempStack.isEmpty()) {
-               fileLineStacks[line] = new StringStack();
-               while(!tempStack.isEmpty()){
-                  char[] tempchar = {tempStack.pop()};
-                  fileLineStacks[line].push(new String(tempchar));
+               
+            // Lines beginning with > are configuration information to be included in
+            // the StringStackDataPack.   
+            } else if(character == '>'){
+               String configString = "";
+               while((character = file.read()) != '\n'){
+                  // Goofy workaround to avoid using library functions to convert char to string
+                  char[] tempChar = {(char) character};
+                  configString += new String(tempChar);
                }
+               switch(configString.toLowerCase()){
+                  case("optimizeon"): optimizeOn = true; break;
+                  case("optimizeoff"): optimizeOff = true; break;
+                  default: comments += configString;
+               }
+            
+            // Ignore whitespace characters (Any UTF-8 character with unicode 
+            // value under 20 as well as unicode 32, which is a space).               
+            } else if(character == '\n' && !tempStack.isEmpty()) {
+               fileData[line] = new StringStackDataPack();
+               fileData[line].comments = comments;
+               fileData[line].optimizeOn = optimizeOn;
+               fileData[line].optimizeOff = optimizeOff;
+               
+               // Once we hit the end of a line, flush out the contents of 
+               // tempStack into the stack of a StringStackDataPack
+               while(!tempStack.isEmpty()){
+                  // Goofy workaround to avoid using library functions to convert char to string
+                  char[] tempchar = {tempStack.pop()};
+                  fileData[line].stack.push(new String(tempchar));
+               }
+               
+               // Increment our line counter and reset the temp variables
                line++;
                tempStack = new CharStack();
-            } else if(character < 20 || character == 32) {   
-               // Ignore whitespace characters (Any UTF-8 character with unicode 
-               // value under 20 as well as unicode 32, which is a space).
+               comments = "";
+               optimizeOn = false;
+               optimizeOff = false;
+            } else if(character < 20 || character == 32){   
                continue;
-            } else {
+               
+            // Normal characters go onto tempStack until we hit a newline   
+            } else if(character != '\n'){
                tempStack.push((char) character);
             }
+
+
+            
          }
       } catch(IOException except){
          System.out.println("There was an error reading " + fileName + ": " + except.getMessage());
@@ -120,12 +123,12 @@ class InputFileHandler
       
       // A file consisting only of comments would result in an array of null StringStacks. 
       // If all are null, return an empty array.
-      for(StringStack stack : fileLineStacks){
-         if(stack != null){
-            return fileLineStacks;
+      for(StringStackDataPack dataPack : fileData){
+         if(dataPack != null){
+            return fileData;
          }
       }
-      return new StringStack[0];
+      return new StringStackDataPack[0];
    }
 
 }

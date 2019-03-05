@@ -1,0 +1,22 @@
+# This file contains test inputs to demonstrate the optimizations 
+# added for commutative operations.
+
+>OptimizeOff
+AB+C+
+
+>OptimizeOn
+AB+C+
+
+>OptimizeOff
+ABCD+++
+
+>OptimizeOn
+ABCD+++
+
+>OptimizeOff
+ABC*+D+
+
+>OptimizeOn
+ABC*+D+
+
+
