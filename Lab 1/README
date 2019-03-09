@@ -1,0 +1,5 @@
+This Lab 1 was developed with openjdk 10.0.2 2018-07-17, using OpenJDK Runtime Environment (build 10.0.2+13-Ubuntu-1ubuntu0.18.04.4) and OpenJDK 64-Bit Server VM (build 10.0.2+13-Ubuntu-1ubuntu0.18.04.4, mixed mode). It was also tested using Java 10.0.2 2018-07-17, using Java(TM) SE Runtime Environment 18.3 (build 10.0.2+13) and Java HotSpot(TM) 64-Bit Server VM 18.3 (build 10.0.2+13, mixed mode).
+
+Development was primarily in vim, with JGrasp used for debugging and some editing.
+
+Lab1PostfixConverter is the main program and the java class that should be executed. See Analysis document for additional details.

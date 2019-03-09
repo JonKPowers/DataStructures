@@ -1,0 +1,92 @@
+***********************************
+***********************************
+Input expression: AB+C+
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+LD	TEMP1
+AD	C
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: AB+C+
+Optimizations: Enabled
+Total compiled instructions: 4
+Compiled Instructions:
+LD	A
+AD	B
+AD	C
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: ABCD+++
+Optimizations: Disabled
+Total compiled instructions: 9
+Compiled Instructions:
+LD	C
+AD	D
+ST	TEMP1
+LD	B
+AD	TEMP1
+ST	TEMP2
+LD	A
+AD	TEMP2
+ST	TEMP3
+
+
+
+***********************************
+***********************************
+Input expression: ABCD+++
+Optimizations: Enabled
+Total compiled instructions: 5
+Compiled Instructions:
+LD	C
+AD	D
+AD	B
+AD	A
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: ABC*+D+
+Optimizations: Disabled
+Total compiled instructions: 9
+Compiled Instructions:
+LD	B
+ML	C
+ST	TEMP1
+LD	A
+AD	TEMP1
+ST	TEMP2
+LD	TEMP2
+AD	D
+ST	TEMP3
+
+
+
+***********************************
+***********************************
+Input expression: ABC*+D+
+Optimizations: Enabled
+Total compiled instructions: 5
+Compiled Instructions:
+LD	B
+ML	C
+AD	A
+AD	D
+ST	TEMP1
+
+
+

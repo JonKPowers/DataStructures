@@ -1,0 +1,160 @@
+***********************************
+***********************************
+Input expression: AB+0+
+Comments: Addition: Adding zero should not change the value.
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+LD	TEMP1
+AD	0
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: AB+0+
+Comments: Addition: With optimizations on, the AD and intermediate ST/LD is skipped.
+Optimizations: Enabled
+Total compiled instructions: 3
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: 0AB++
+Comments: Addition: Adding a value to zero should result in that value.
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+LD	0
+AD	TEMP1
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: 0AB++
+Comments: Addition: With optimizations on, we go directly to that value 
+Optimizations: Enabled
+Total compiled instructions: 3
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: AB*0-
+Comments: Subtraction: Subtracting zero from a number should not change the value
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+ML	B
+ST	TEMP1
+LD	TEMP1
+SB	0
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: AB*0-
+Comments: Subtraction: With optimizations on, we skip the operation.
+Optimizations: Enabled
+Total compiled instructions: 3
+Compiled Instructions:
+LD	A
+ML	B
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: AB+0*
+Comments: Multiplication: This expression should reduce to zero.
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+LD	TEMP1
+ML	0
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: AB+0*
+Comments: Multiplication: With optimizations on, it does.
+Optimizations: Enabled
+Total compiled instructions: 3
+Compiled Instructions:
+LD	A
+AD	B
+LD	0
+
+
+
+***********************************
+***********************************
+Input expression: 0AB*/
+Comments: Division: Zero divded by a number should equal zero
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+ML	B
+ST	TEMP1
+LD	0
+DV	TEMP1
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: 0AB*/
+Comments: Division: With optimizations on, we go directly to zero (mostly).
+Optimizations: Enabled
+Total compiled instructions: 4
+Compiled Instructions:
+LD	A
+ML	B
+ST	TEMP1
+LD	0
+
+
+
+***********************************
+***********************************
+Input expression: ABC*+0/
+Comments: Division: Division by zero is undefined and will result in a rejected expression
+There was a problem with the expression: Error in expression: Attempts to divide by zero
+
+
+***********************************
+***********************************
+Input expression: ABC*+0/
+Comments: Division: This is true whether or not optimizations are enabled.
+There was a problem with the expression: Error in expression: Attempts to divide by zero
+
+

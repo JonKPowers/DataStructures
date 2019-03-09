@@ -1,0 +1,80 @@
+***********************************
+***********************************
+Input expression: AB+4$
+Comments: When the exponent operand is a digit 0-9, the compiler will treat the digit as an integer and will apply a naive exponentiation.
+Optimizations: Enabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+AD	B
+ML	TEMP1
+ML	TEMP1
+ML	TEMP1
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: AB+C$
+Comments: This expression returns an error because the exponent is not a digit.
+There was a problem with the expression: Exponent power must be a digit
+
+
+***********************************
+***********************************
+Input expression: AB+0$
+Comments: A value raised to the zeroth power is one.
+Optimizations: Disabled
+Total compiled instructions: 3
+Compiled Instructions:
+LD	A
+AD	B
+LD	1
+
+
+
+***********************************
+***********************************
+Input expression: AB+0*0$
+Comments: Zero raised to the zeroth power is not defined and will raise an error.
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+LD	TEMP1
+ML	0
+LD	1
+
+
+
+***********************************
+***********************************
+Input expression: AB+1$
+Comments: Raising something to the 1st power leaves it unchanged.
+Optimizations: Enabled
+Total compiled instructions: 3
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: AB+1$
+Comments: Raising something to the 1st power leaves it unchanged. When optimizations are off, a number of superfluous instructions are generated.
+Optimizations: Disabled
+Total compiled instructions: 5
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+LD	TEMP1
+ST	TEMP2
+
+
+

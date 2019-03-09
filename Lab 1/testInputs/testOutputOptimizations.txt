@@ -1,0 +1,112 @@
+***********************************
+***********************************
+Input expression: ABC++
+Comments: This example requires 6 instructions when optimizations are turned off.
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	B
+AD	C
+ST	TEMP1
+LD	A
+AD	TEMP1
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: ABC++
+Comments: This same expression requires only 4 instructions when optimizations are enabled.
+Optimizations: Enabled
+Total compiled instructions: 4
+Compiled Instructions:
+LD	B
+AD	C
+AD	A
+ST	TEMP1
+
+
+
+***********************************
+***********************************
+Input expression: ABC*+DE-/
+Comments: This example from the Lab 1 assignment takes 12 instructions without optimizations enabled.
+Optimizations: Disabled
+Total compiled instructions: 12
+Compiled Instructions:
+LD	B
+ML	C
+ST	TEMP1
+LD	A
+AD	TEMP1
+ST	TEMP2
+LD	D
+SB	E
+ST	TEMP3
+LD	TEMP2
+DV	TEMP3
+ST	TEMP4
+
+
+
+***********************************
+***********************************
+Input expression: ABC*+DE-/
+Comments: The same example takes 10 instructions when optimizations are enabled.
+Optimizations: Enabled
+Total compiled instructions: 10
+Compiled Instructions:
+LD	B
+ML	C
+AD	A
+ST	TEMP1
+LD	D
+SB	E
+ST	TEMP2
+LD	TEMP1
+DV	TEMP2
+ST	TEMP3
+
+
+
+***********************************
+***********************************
+Input expression: ABC*+DE-*
+Comments: The mix of operators can make a big difference.
+Optimizations: Disabled
+Total compiled instructions: 12
+Compiled Instructions:
+LD	B
+ML	C
+ST	TEMP1
+LD	A
+AD	TEMP1
+ST	TEMP2
+LD	D
+SB	E
+ST	TEMP3
+LD	TEMP2
+ML	TEMP3
+ST	TEMP4
+
+
+
+***********************************
+***********************************
+Input expression: ABC*+DE-*
+Comments: The mix of operators can make a big difference.
+Optimizations: Enabled
+Total compiled instructions: 8
+Compiled Instructions:
+LD	B
+ML	C
+AD	A
+ST	TEMP1
+LD	D
+SB	E
+ML	TEMP1
+ST	TEMP2
+
+
+

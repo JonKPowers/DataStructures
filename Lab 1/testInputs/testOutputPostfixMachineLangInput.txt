@@ -1,0 +1,114 @@
+***********************************
+***********************************
+Input expression: AB+C-
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	A
+AD	B
+ST	TEMP1
+LD	TEMP1
+SB	C
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: ABC+-
+Optimizations: Disabled
+Total compiled instructions: 6
+Compiled Instructions:
+LD	B
+AD	C
+ST	TEMP1
+LD	A
+SB	TEMP1
+ST	TEMP2
+
+
+
+***********************************
+***********************************
+Input expression: AB-C+DEF-+$
+There was a problem with the expression: Exponent power must be a digit
+
+
+***********************************
+***********************************
+Input expression: ABCDE-+$*EF*-
+There was a problem with the expression: Exponent power must be a digit
+
+
+***********************************
+***********************************
+Input expression: ABC+*CBA-+*
+Optimizations: Disabled
+Total compiled instructions: 15
+Compiled Instructions:
+LD	B
+AD	C
+ST	TEMP1
+LD	A
+ML	TEMP1
+ST	TEMP2
+LD	B
+SB	A
+ST	TEMP3
+LD	C
+AD	TEMP3
+ST	TEMP4
+LD	TEMP2
+ML	TEMP4
+ST	TEMP5
+
+
+
+***********************************
+***********************************
+Input expression: ABC+/CBA*+
+There was a problem with the expression: The input contained too many operands for the expression.
+
+
+***********************************
+***********************************
+Input expression: AB-*CBA+-*
+There was a problem with the expression: The input contained too few operands for the expression
+
+
+***********************************
+***********************************
+Input expression: ABC-/BA-+/
+There was a problem with the expression: The input contained too few operands for the expression
+
+
+***********************************
+***********************************
+Input expression: ABC+$CBA-+*
+There was a problem with the expression: Exponent power must be a digit
+
+
+***********************************
+***********************************
+Input expression: AB0+/CBA+-/
+Optimizations: Disabled
+Total compiled instructions: 15
+Compiled Instructions:
+LD	B
+AD	0
+ST	TEMP1
+LD	A
+DV	TEMP1
+ST	TEMP2
+LD	B
+AD	A
+ST	TEMP3
+LD	C
+SB	TEMP3
+ST	TEMP4
+LD	TEMP2
+DV	TEMP4
+ST	TEMP5
+
+
+
