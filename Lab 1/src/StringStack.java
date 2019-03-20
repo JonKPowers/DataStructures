@@ -1,7 +1,7 @@
 class StringStack
 {
    /**
-   ** The StringStack class provides a stack implementation for String dat types 
+   ** The StringStack class provides a stack implementation for String data types 
    ** providing standard methods to manipulate the stack. The stack
    ** is implemented using an array, but the array will automatically increase
    ** its size to prevent overflows. The overflow protection cannot be overridden.
