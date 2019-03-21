@@ -6,7 +6,7 @@ class lab2RecursiveTowers{
         // Error checking that number of towers is valid
         // Error checking that file name is valid
 
-        moveDiscs(3, "A", "B", "C");
+        moveDiscs(35, "A", "B", "C");
 
     }
 

@@ -36,19 +36,6 @@ class IterativeTower
 
     }
 
-    private int getTowerIndex(String targetTower){
-        /**
-        ** getTowerIndex() converts the tower's String identifier 
-        ** (e.g., "A", "B", or "C") to an integer, with tower A
-        ** corresponding to 1, tower B corresponding to 2, and tower C
-        ** corresponding to 3. This is used to [______________]
-        **
-        **  @param targetTower A String indicating the tower that discs will be moved to.
-        **
-        **  @return int The integer identifer for the specified tower.
-        **/
-    }
-
     private int getWorkingDirection(int towerSize, String targetTower){
         /**
         ** getWorkingDirection() determines whether moves should be 
