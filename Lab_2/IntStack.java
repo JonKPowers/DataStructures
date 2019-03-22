@@ -1,7 +1,7 @@
-class StringStack
+class IntStack
 {
    /**
-   ** The StringStack class provides a stack implementation for String data types 
+   ** The IntStack class provides a stack implementation for int primitives, 
    ** providing standard methods to manipulate the stack. The stack
    ** is implemented using an array, but the array will automatically increase
    ** its size to prevent overflows. The overflow protection cannot be overridden.
@@ -10,64 +10,25 @@ class StringStack
    ** @version 0.1
    **/
    
-   private String[] stack;
+   private int[] stack;
    private int top;
    private final int INITIALSIZE = 8;
    
    // Constructors
-   StringStack(){
+   IntStack(){
       /** This constructor provides a stack with an initial size of INITIALSIZE
       **/
-      stack = new String[INITIALSIZE];
+      stack = new int[INITIALSIZE];
       top = -1;
    }
    
-   StringStack(int stackSize){
+   IntStack(int stackSize){
       /** This constructor provides a stack with an initial size of stackSize
       **
       ** @param stackSize The initial size of the new stack.
       **/
-      stack = new String[stackSize];
+      stack = new int[stackSize];
       top = -1;
-   }
-   
-   StringStack(String seedString){
-      /**
-      ** This constructor takes in a String, which is placed onto the stack 
-      ** during initialization.
-      **
-      ** @param seedString The String to be used to initialize the stack
-      **/
-      stack = new String[seedString.length()];
-      String[] seedArray = seedString.split("");
-      for(int i=0; i<seedString.length(); i++){
-         stack[i] = seedArray[i];
-      }
-      top = seedString.length() - 1;
-   }
-   
-   StringStack(String seedString, boolean reverseIt){
-      /**
-      ** This constructor takes in a String, which is placed onto the stack 
-      ** during initialization. Optionally, the stack can be initialized with
-      ** the string reversed.
-      **
-      ** @param seedString The String to be used to initialize the stack
-      ** @param reverseIt If true, the String will be placed onto the stack in reverse order. 
-      **/
-      stack = new String[seedString.length()];
-      String[] seedArray = seedString.split("");
-      if(reverseIt) {
-         int j = 0;
-         for(int i=seedString.length() - 1; i>-1; i--){
-            stack[j++] = seedArray[i];
-         }
-      } else {
-         for(int i=0; i<seedString.length(); i++){
-            stack[i] = seedArray[i];
-         }
-      }
-      top = seedString.length() - 1;
    }
    
    //
@@ -94,14 +55,14 @@ class StringStack
       return top + 1;
    }
    
-   public void push(String newItem){
+   public void push(int newItem){
       /**
       ** push() adds an element to the top of the stack. If for any reason, the method encounters
       ** a problem assigning the new element to the correct position in the array, it will print
       ** an error message and not modify the stack array. While this stack implementation
       ** is designed to avoid overflows, and thus out of bounds exceptions, you can never
       ** be too careful.
-      **s
+      **
       ** @param newItem The String that is to be added to the stack.
       ** @return None Nothing is returned.
       **
@@ -118,11 +79,11 @@ class StringStack
       }
    }
    
-   public String pop()throws EmptyStackException{
+   public int pop()throws EmptyStackException{
       /**
       ** pop() removes the top element on the stack and returns it.
       **
-      ** @return String The item that was removed from the top of the stack.
+      ** @return int The item that was removed from the top of the stack.
       ** @throws EmptyStackError On an attempt to call pop() on an empty stack.
       **
       **/
@@ -132,11 +93,11 @@ class StringStack
       return stack[top--];
    }
    
-   public String peek()throws EmptyStackException{
+   public int peek()throws EmptyStackException{
       /**
       ** peek() returns the top element on the stack without removing it.
       **
-      ** @return String The item at the top of the stack.
+      ** @return int The item at the top of the stack.
       ** @throws EmptyStackError On an attempt to call peek() on an empty stack.
       **
       **/
@@ -153,23 +114,24 @@ class StringStack
       ** viewStack() provides a String representation of the contents of the stack, allowing
       ** the user to view the entire contents of the stack.
       **
-      ** @return String A String containing all elements of the stack, with the top aligned to the left.
+      ** @return int An int containing all elements of the stack, with the top aligned to the left.
       **
       **/
       String stackString = "";
       for(int i=0; i<=top; i++){
+        stackString += i == 0 ? "" : " ";
          stackString += stack[i];
       }
-      return stackString;
+       return stackString;
    }
    
-   public StringStack copy(){
+   public IntStack copy(){
       /**
       ** copy() makes and returns a copy of the current stack in its current state.
       **
-      ** @return StringStack A copy of the current stack.
+      ** @return IntStack A copy of the current stack.
       **/
-      StringStack stackCopy = new StringStack(this.getLength());
+      IntStack stackCopy = new IntStack(this.getLength());
       for(int i=0; i<=this.top; i++){
          stackCopy.push(this.stack[i]);
       }
@@ -183,7 +145,7 @@ class StringStack
       ** @return None Nothing is returned.
       **/
       for(int i=0; i < (top + 1) / 2; i++){
-         String temp = stack[i];
+         int temp = stack[i];
          stack[i] = stack[top - i];
          stack[top - i] = temp;
       }
@@ -215,7 +177,7 @@ class StringStack
       ** @return None Nothing is returned.
       **/
       
-      String[] newStack = new String[stack.length * 2];
+      int[] newStack = new int[stack.length * 2];
       
       // Copy the contents of the full array to the new, larger array
       for(int i=0; i<stack.length; i++){
