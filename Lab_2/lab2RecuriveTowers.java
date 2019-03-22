@@ -38,7 +38,7 @@ class RecursiveTowers{
    }
 
    public static String makeMove(int numDiscs, String start, String end){
-      String outputString = "Move disc " + numDiscs + " from peg " + start + " to peg " + end + ".\n";
+      String outputString = "Move disc " + numDiscs + " from Tower " + start + " to Tower " + end + "\n";
       return outputString;
    }
 }

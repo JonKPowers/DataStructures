@@ -146,7 +146,7 @@ class IterativeTowers
       **/      
       int discNum = this.towers[startingTower].peek();
       this.towers[targetTower].push(this.towers[startingTower].pop());
-      this.moveList += "Move disc " + discNum + " from " + getTowerString(startingTower) + " to " + getTowerString(targetTower) + "\n";
+      this.moveList += "Move disc " + discNum + " from Tower " + getTowerString(startingTower) + " to Tower " + getTowerString(targetTower) + "\n";
    }
 
    private int findLegalMove(int startingTower){

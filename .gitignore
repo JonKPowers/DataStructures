@@ -6,3 +6,4 @@ test/
 output.txt
 *.zip
 *.swp
+output*.txt
