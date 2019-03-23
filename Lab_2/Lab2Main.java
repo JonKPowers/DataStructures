@@ -1,3 +1,8 @@
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.File;
+import java.io.IOException;
+
 class Lab2Main
 {
 
@@ -5,6 +10,9 @@ class Lab2Main
       String method, outputFile;
       String targetTower;
       String moveList;
+      
+      Timer timer = new Timer("Time it");
+      File tempSolutionFile;
 
       int numDiscs;
       boolean optimize;     
@@ -17,25 +25,76 @@ class Lab2Main
       method = getSolveMethod(args);
       numDiscs = getNumDiscs(args);
       outputFile = getOutputFile(args);
-      
+     
       targetTower = "C";
       
       if(numDiscs == 1) {
          // DO SOMETHING HERE FOR EDGE CASE.
       }
       
+      
+      
+
+      
       // Solve the Towers of Hanoi problem
-      if(method.equals("recursive")){
-         RecursiveTowers tower = new RecursiveTowers(numDiscs, targetTower);
-         tower.solve();
-         moveList = tower.getMoveList();
-      } else { // method.equals("iterative");
-         IterativeTowers tower = new IterativeTowers(numDiscs, targetTower);
-         tower.solve();
-         moveList = tower.getMoveList();
+      try {
+         tempSolutionFile = File.createTempFile("TOHSolution", ".tmp");
+         tempSolutionFile.deleteOnExit();
+         
+         try(FileWriter tempFileWriter = new FileWriter(tempSolutionFile)){
+         
+            // Start the timer
+            timer.start();
+            
+            // Solve the problem
+            if(method.equals("recursive")){
+               RecursiveTowers tower = new RecursiveTowers(numDiscs, targetTower, tempFileWriter);
+               tower.solve();
+               moveList = tower.getMoveList();
+            } else { // method.equals("iterative");
+               ImprovedIterativeTowers tower = new ImprovedIterativeTowers(numDiscs, targetTower, tempFileWriter);
+               tower.solve();
+               moveList = tower.getMoveList();
+            }
+            
+            // Stop the timer
+            timer.stop();
+            
+         } catch (IOException except) {   // Writing to solution file
+            System.out.println("Error writing to solution tempFile: " + except.getMessage());
+         }
+            
+            // Send the program output to the provided outputFile
+            try(FileWriter outputFileWriter = new FileWriter(outputFile)){
+               outputFileWriter.write("***********************************\n***********************************\n");
+               outputFileWriter.write("Towers of Hanoi Results\n");
+               outputFileWriter.write("Number of Discs: " + numDiscs + "\n");
+               outputFileWriter.write("Method of Solving: " + method + "\n");
+               outputFileWriter.write("Total moves: " + "____TODO_____\n");
+               outputFileWriter.write("Time to solve: " + timer.getElapsedSeconds() + "seconds.\n");
+               outputFileWriter.write("\nSolution:\n");
+               
+               try(FileReader solutionFile = new FileReader(tempSolutionFile)){
+                  int input;
+                  while ((input = solutionFile.read()) != -1){
+                     outputFileWriter.write(input);
+                  }
+               } catch (IOException except) {   // Reading solution file
+                  System.out.println("Error: There was a problem reading the solution temp file:\n\t" + except.getMessage());
+               }
+               
+            } catch (IOException except){ //Writing output to file
+               System.out.println("There was an error writing the output to " + outputFile + ":");
+               System.out.println(except.getMessage());
+            }
+
+      } catch (IOException except) {   // Creating temporary file
+         System.out.println("Error creating temporary file: " + except.getMessage());
       }
 
-      System.out.println(moveList);
+
+      
+
    }
    
    private static void badArguments(String message){
