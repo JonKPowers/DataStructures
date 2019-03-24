@@ -8,18 +8,29 @@ class Memoizer
    private String[] cToBMoves;
    
    Memoizer(int maxSize){
-      aToBMoves = new String[maxSize];
-      bToAMoves = new String[maxSize];
-      aToCMoves = new String[maxSize];
-      cToAMoves = new String[maxSize];
-      bToCMoves = new String[maxSize];
-      cToBMoves = new String[maxSize];
+      aToBMoves = new String[maxSize+1];
+      bToAMoves = new String[maxSize+1];
+      aToCMoves = new String[maxSize+1];
+      cToAMoves = new String[maxSize+1];
+      bToCMoves = new String[maxSize+1];
+      cToBMoves = new String[maxSize+1];
    }
    
    public String getMoves(int discNum, String sourceTower, String endTower){
       String[] movesArray = getMovesArray(sourceTower, endTower);
-      return movesArray[discNum] == null ? "" : movesArray[discNum];
+      String moves = movesArray[discNum];
       
+      if (moves == null){
+         throw new RuntimeException("You need to run Memoizer.moveStored() before calling getMoves()!");
+      } else {
+         return moves;
+      }
+           
+   }
+   
+   public boolean moveStored(int discNum, String startTower, String endTower) {
+      String[] movesArray = getMovesArray(startTower, endTower);
+      return movesArray[discNum] == null ? false : true;
    }
    
    public void setMoves(int discNum, String sourceTower, String endTower, String movesString){

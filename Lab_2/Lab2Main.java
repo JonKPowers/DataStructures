@@ -25,6 +25,7 @@ class Lab2Main
       method = getSolveMethod(args);
       numDiscs = getNumDiscs(args);
       outputFile = getOutputFile(args);
+      optimize = getOptimizeSetting(args);
      
       targetTower = "C";
       
@@ -48,7 +49,7 @@ class Lab2Main
             
             // Solve the problem
             if(method.equals("recursive")){
-               RecursiveTowers tower = new RecursiveTowers(numDiscs, targetTower, tempFileWriter);
+               RecursiveTowers tower = new RecursiveTowers(numDiscs, targetTower, tempFileWriter, optimize);
                tower.solve();
                moveList = tower.getMoveList();
             } else { // method.equals("iterative");
