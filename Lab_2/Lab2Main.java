@@ -69,6 +69,7 @@ class Lab2Main
             try(FileWriter outputFileWriter = new FileWriter(outputFile)){
                outputFileWriter.write("***********************************\n***********************************\n");
                outputFileWriter.write("Towers of Hanoi Results\n");
+               outputFileWriter.write("***********************************\n***********************************\n");
                outputFileWriter.write("Number of Discs: " + numDiscs + "\n");
                outputFileWriter.write("Method of Solving: " + method + "\n");
                outputFileWriter.write("Total moves: " + "____TODO_____\n");
@@ -92,10 +93,6 @@ class Lab2Main
       } catch (IOException except) {   // Creating temporary file
          System.out.println("Error creating temporary file: " + except.getMessage());
       }
-
-
-      
-
    }
    
    private static void badArguments(String message){
@@ -138,6 +135,7 @@ class Lab2Main
       }
       
       return numDiscs;
+      
    }
    
    private static String getOutputFile(String[] args){
@@ -145,7 +143,7 @@ class Lab2Main
       // If "optimize" is the third argument, then they probably didn't intend that as 
       // the output file, so throw them an error and ask them to try again.
       if(outputFile.toLowerCase().equals("optimize")){
-         badArguments("\"optimize\" is not a permitted output file name.");
+         badArguments("\"optimize\" is not a permitted output file name. Check usage.");
       }
       
       return outputFile;

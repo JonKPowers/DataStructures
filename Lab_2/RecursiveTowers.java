@@ -37,15 +37,11 @@ class RecursiveTowers{
    public String getMoveList(){
       return this.output;
    }
-   
-
 
    private String moveDiscs(int numDiscs, String start, String temp, String end) throws IOException {
       if (this.optimize && this.moveMemory.moveStored(numDiscs, start, end)) {
          String moves = this.moveMemory.getMoves(numDiscs, start, end);
-         this.output += moves;
-         
-         dumpOutput(this.DUMP_LIMIT);
+         this.outputFile.write(moves);
          return moves;
          
       } else {
@@ -80,12 +76,9 @@ class RecursiveTowers{
    }
    
    private void dumpOutput(int maxBuffered)throws IOException{
-      if (this.outputCounter > maxBuffered) {
+      if (this.output.length() > maxBuffered) {
          this.outputFile.write(this.output);
-         this.outputCounter = 0;
          this.output = "";
       }
-      
-      this.outputCounter++;
    }
 }
