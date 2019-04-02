@@ -65,7 +65,7 @@ class Lab2Main
          tempSolutionFile = File.createTempFile("TOHSolution", ".tmp");
          tempSolutionFile.deleteOnExit();
          
-         try(FileWriter tempFileWriter = new FileWriter(tempSolutionFile)){
+         try(FileWriter tempFileWriter = new FileWriter("TempFileDELETEME" + method + (optimize ? "optimized" : "") + ".tmp")){
          
             // Start the timer
             timer.start();
@@ -103,7 +103,7 @@ class Lab2Main
                outputFileWriter.write("***********************************\n***********************************\n");
                outputFileWriter.write("Number of Discs: " + numDiscs + "\n");
                outputFileWriter.write("Method of Solving: " + method + "\n");
-               if(method.equals("recursion")){
+               if(method.equals("recursive")){
                   outputFileWriter.write("Optimization: " + (optimize ? "enabled" : "disabled") + "\n");
                }
                outputFileWriter.write("Total moves: " + numMoves +"\n");

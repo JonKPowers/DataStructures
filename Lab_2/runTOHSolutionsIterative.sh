@@ -1,36 +1,36 @@
 #!/bin/bash
 
-java Lab2Main iterative 1 solution_iterative_1.txt
-java Lab2Main iterative 2 solution_iterative_2.txt
-java Lab2Main iterative 3 solution_iterative_3.txt
-java Lab2Main iterative 4 solution_iterative_4.txt
-java Lab2Main iterative 5 solution_iterative_5.txt
-java Lab2Main iterative 6 solution_iterative_6.txt
-java Lab2Main iterative 7 solution_iterative_7.txt
-java Lab2Main iterative 8 solution_iterative_8.txt
-java Lab2Main iterative 9 solution_iterative_9.txt
-java Lab2Main iterative 10 solution_iterative_10.txt
-java Lab2Main iterative 11 solution_iterative_11.txt
-java Lab2Main iterative 12 solution_iterative_12.txt
-java Lab2Main iterative 13 solution_iterative_13.txt
-java Lab2Main iterative 14 solution_iterative_14.txt
-java Lab2Main iterative 15 solution_iterative_15.txt
-java Lab2Main iterative 16 solution_iterative_16.txt
-java Lab2Main iterative 17 solution_iterative_17.txt
-java Lab2Main iterative 18 solution_iterative_18.txt
-java Lab2Main iterative 19 solution_iterative_19.txt
-java Lab2Main iterative 20 solution_iterative_20.txt
-java Lab2Main iterative 21 solution_iterative_21.txt
-java Lab2Main iterative 22 solution_iterative_22.txt
-java Lab2Main iterative 23 solution_iterative_23.txt
-java Lab2Main iterative 24 solution_iterative_24.txt
-java Lab2Main iterative 25 solution_iterative_25.txt
-java Lab2Main iterative 26 solution_iterative_26.txt
-java Lab2Main iterative 27 solution_iterative_27.txt
-java Lab2Main iterative 28 solution_iterative_28.txt
-java Lab2Main iterative 29 solution_iterative_29.txt
-java Lab2Main iterative 30 solution_iterative_30.txt
-java Lab2Main iterative 31 solution_iterative_31.txt
+# java Lab2Main iterative 1 solution_iterative_1.txt
+# java Lab2Main iterative 2 solution_iterative_2.txt
+# java Lab2Main iterative 3 solution_iterative_3.txt
+# java Lab2Main iterative 4 solution_iterative_4.txt
+# java Lab2Main iterative 5 solution_iterative_5.txt
+# java Lab2Main iterative 6 solution_iterative_6.txt
+# java Lab2Main iterative 7 solution_iterative_7.txt
+# java Lab2Main iterative 8 solution_iterative_8.txt
+# java Lab2Main iterative 9 solution_iterative_9.txt
+# java Lab2Main iterative 10 solution_iterative_10.txt
+# java Lab2Main iterative 11 solution_iterative_11.txt
+# java Lab2Main iterative 12 solution_iterative_12.txt
+# java Lab2Main iterative 13 solution_iterative_13.txt
+# java Lab2Main iterative 14 solution_iterative_14.txt
+# java Lab2Main iterative 15 solution_iterative_15.txt
+# java Lab2Main iterative 16 solution_iterative_16.txt
+# java Lab2Main iterative 17 solution_iterative_17.txt
+# java Lab2Main iterative 18 solution_iterative_18.txt
+# java Lab2Main iterative 19 solution_iterative_19.txt
+# java Lab2Main iterative 20 solution_iterative_20.txt
+# java Lab2Main iterative 21 solution_iterative_21.txt
+# java Lab2Main iterative 22 solution_iterative_22.txt
+# java Lab2Main iterative 23 solution_iterative_23.txt
+# java Lab2Main iterative 24 solution_iterative_24.txt
+# java Lab2Main iterative 25 solution_iterative_25.txt
+# java Lab2Main iterative 26 solution_iterative_26.txt
+# java Lab2Main iterative 27 solution_iterative_27.txt
+# java Lab2Main iterative 28 solution_iterative_28.txt
+# java Lab2Main iterative 29 solution_iterative_29.txt
+# java Lab2Main iterative 30 solution_iterative_30.txt
+# java Lab2Main iterative 31 solution_iterative_31.txt
 java Lab2Main iterative 32 solution_iterative_32.txt
 java Lab2Main iterative 33 solution_iterative_33.txt
 java Lab2Main iterative 34 solution_iterative_34.txt

@@ -3,6 +3,19 @@ import java.io.IOException;
 
 class ImprovedIterativeTowers
 {
+   /**
+   ** ImproverIterativeTowers provides an iterative solution to the Towers
+   ** of Hanoi problem. The optimum solutions to the TOH problem, iteratively
+   ** viewed, always follows a simple pattern involving a cycling around each
+   ** pair of towers. It starts with an exchange between the first and second towers,
+   ** then between the first and last towers, and finally between the second and last
+   ** towers. The exact order of the cycle varies with the number of discs being
+   ** solved for and which tower you want the stack to ultimately be moved to.
+   ** But once determined, the order of the cycle never changes and always
+   ** results in an optimum solution.
+   **
+   **/
+
    private int towerSize;
    
    // Variables to represent the three disc stacks
@@ -12,23 +25,14 @@ class ImprovedIterativeTowers
    private IntStack[] towers = {towerA, towerB, towerC};
    private String[] towerStrings = {"A", "B", "C"};
    
-   private String output;
    private FileWriter outputFile;
-   private int outputCounter;
-
-   // State tracking variables
-   private int smallDiscLoc;  // Location of the small disc
-   private int discSizeFlag;  // Tracks which disc to move, big or small
-
-   private int moveDirection; // Direction of movements
    private long numMoves;     // # of moves required to solve the towers
    private long currentMove;  // Move we are currently on
-   
-   private String moveList = "";
+
 
    /******************************
    *******************************
-   ***   Constructors
+   ***   Constructor
    ******************************
    ******************************/
 
@@ -50,7 +54,7 @@ class ImprovedIterativeTowers
          throw new IllegalArgumentException("The size of the IterativeTowers must be less than " + (Integer.MAX_VALUE - 1) +".");
       }
       
-      // Initialize Tower A
+      // Initialize Tower A--Seed with the discs
       this.towerSize = towerSize;
          for(int i = towerSize; i > 0; i--){
             towerA.push(i);
@@ -60,7 +64,12 @@ class ImprovedIterativeTowers
       this.numMoves = this.getNumMoves(towerSize);
       this.currentMove = 1;
       
-      // Adjust tower order for number of discs
+      // Adjust tower order for number of discs.
+      // If number of discs is even, then Towers B and C effectively switch places
+      // in order to have the discs end up on the desired tower. this.towerStrings
+      // is used to convert between index positions and tower identifiers, so
+      // we can simply swap the identifiers in this.towerStrings to establish the
+      // correct ordering of the towers.
       if(towerSize % 2 == 0) {
          flipLastTwoTowers();
       }
@@ -74,9 +83,8 @@ class ImprovedIterativeTowers
          flipLastTwoTowers();         
       }
       
-      this.output = "";
+      // Set up output FileWriter
       this.outputFile = outputFile;
-      this.outputCounter = 0;
    }
     
 /******************************
@@ -88,13 +96,11 @@ class ImprovedIterativeTowers
    public void solve() throws IOException {
       /**
       ** solverTower() generates a solution to the Towers of
-      ** Hanoi problem. Discs begin on Tower A and are moved to the targetTower.
-      ** The problem is solved by making moves in the this.moveDirection, with 
-      ** moves alternating between the smallest disc and the second smallest
-      ** disc. They are moved to the first available legal position in the
-      ** this.moveDirection (the pegs are treated as circular).
+      ** Hanoi problem. Discs begin on Tower A and are moved to the targetTower. The
+      ** problem is solved by cycling through the pairs of towers and making whatever
+      ** legal move is available between them.
       **
-      ** @param targetTower The tower that the discs should be moved to, i.e., "B" or "C".
+      ** @return None Nothing is returned
       **/
       
 
@@ -108,20 +114,14 @@ class ImprovedIterativeTowers
          this.currentMove++;
       }
    }
-   
-   public String getMoveList(){
-      /**
-      ** getMoveList() provides a String containing the moves required to
-      ** solve the TOH problem. this.solve() MUST be called before calling
-      ** getMoveList().
-      **
-      ** @return String A string containing the moves required to solve the TOH problem.
-      **/
-      
-      return this.moveList;
-   }
+
    
    public long getNumMoves(){
+      /**
+      ** getNumMoves() does what it says.
+      **
+      ** @return long The number of moves required to solve the TOH problem.
+      **/
       return this.numMoves;
    }
 
@@ -134,7 +134,8 @@ class ImprovedIterativeTowers
    private void makeMove(int startingTower, int targetTower) throws IOException {
       /**
       ** makeMove() moves the disc on top of the startingTower to the targetTower.
-      ** It updates the appropriate tower IntStacks and [_____________________].
+      ** This is needed because findHighestTower needs to look at the disc
+      ** on the top of each tower to determine what moves are legal.
       **
       ** @param startingTower The tower containing the disc to be moved.
       ** @param targetTower The tower that the disc should be moved to.
@@ -147,6 +148,16 @@ class ImprovedIterativeTowers
    }
    
    private int[] getMovePair(){
+      /**
+      ** getMovePair() determines what two towers should have a disc moved between them.
+      ** Since the pairs of towers involved in a move cycle in a three-based pattern,
+      ** we can work out what the correct pair is using a modulus operation and how many
+      ** moves have been made so far. Some error guarding is in place to handle very large numbers 
+      ** that can occur with larger TOH problem sizes.
+      **
+      ** @return int[] An array with the first element being the starting tower and the second being the destination tower.
+      **
+      **/
       int[] moves = new int[2];
       int highestValue;
       long tempCurrentMove = this.currentMove;
@@ -179,6 +190,14 @@ class ImprovedIterativeTowers
    }
    
    private int findHighestTower(int tower1, int tower2){
+      /**
+      ** findHighestTower() determines which of two towers has the highest-numbered disc on top.
+      **
+      ** @param tower1 The first tower to be examined
+      ** @param tower2 The second tower to be examined.
+      ** @return int The integer index of the tower with the highest-numbered disc on top.
+      **
+      **/
       int tower1Value = towers[tower1].isEmpty() ? Integer.MAX_VALUE : towers[tower1].peek();
       int tower2Value = towers[tower2].isEmpty() ? Integer.MAX_VALUE : towers[tower2].peek();
       
@@ -186,6 +205,11 @@ class ImprovedIterativeTowers
    }
    
    private void flipLastTwoTowers(){
+      /**
+      **
+      **
+      **
+      **/
       towers[1] = this.towerC;
       towers[2] = this.towerB;
       
@@ -212,6 +236,14 @@ class ImprovedIterativeTowers
    }
    
    private String getTowerString(int towerNum){
+      /**
+      ** getTowerString() provides a translation between the tower's index in 
+      ** this.towerStrings and it's human-friendly String format. 
+      **
+      ** @param towerNum The tower's index number
+      ** @return String The String identifier of the tower
+      **
+      **/
       return this.towerStrings[towerNum];
    }
 }
