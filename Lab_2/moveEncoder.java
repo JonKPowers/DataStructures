@@ -8,12 +8,12 @@ class moveEncoder
    //
    // Tower encoding table:
    // startTower     endTower    moveCode
-   // A(0)           B(1)        1
-   // B(1)           A(0)        -1
-   // A(0)           C(2)        2
-   // C(3)           A(0)        -2
-   // B(1)           C(2)        3
-   // C(2)           B(1)        -3
+   // A(0)           B(1)        3
+   // B(1)           A(0)        -3
+   // A(0)           C(2)        5
+   // C(3)           A(0)        -5
+   // B(1)           C(2)        7
+   // C(2)           B(1)        -7
 
    public int encode(int discNum, int startTower, int endTower){
       if(discNum < 1){
@@ -26,11 +26,11 @@ class moveEncoder
       int encodedMove;
    
       if(startTower == 0 && endTower == 1 || startTower == 1 && endTower == 0){
-         encodedMove = startTower < endTower ? 1 : -1;
-      } else if (startTower == 0 && endTower == 2 || startTower == 2 && endTower == 0){
-         encodedMove = startTower < endTower ? 2 : -2;
-      } else if (startTower == 1 && endTower == 2 || startTower == 2 && endTower == 1){
          encodedMove = startTower < endTower ? 3 : -3;
+      } else if (startTower == 0 && endTower == 2 || startTower == 2 && endTower == 0){
+         encodedMove = startTower < endTower ? 5 : -5;
+      } else if (startTower == 1 && endTower == 2 || startTower == 2 && endTower == 1){
+         encodedMove = startTower < endTower ? 7 : -7;
       } else {
          throw new RuntimeException("Bad start/end tower combination passed to moveEncoder.encode()");
       }
@@ -41,8 +41,8 @@ class moveEncoder
    public String decodeToString(int moveCode){
       String decodedString;
    
-      int discNum = getDiscNum(moveCode);
-      int towersCode = moveCode / discNum;
+      int towersCode = getPrime(moveCode);
+      int discNum = moveCode / towersCode;
       int[] towers = getTowers(towersCode);
       
       int startTower = towersCode > 0 ? towers[0] : towers[1];
@@ -54,23 +54,31 @@ class moveEncoder
       return decodedString;
    }
    
-   private int getDiscNum(int moveCode){
-      return ((moveCode-1) / 3) + 1;
+   private int getPrime(int moveCode){      
+      if(Math.abs(moveCode) % 7 == 0){
+         return moveCode / 7;
+      } else if(Math.abs(moveCode) % 5 == 0){
+         return moveCode / 5;
+      } else if (Math.abs(moveCode) % 3 == 0) {
+         return 3;
+      } else {
+         throw new IllegalArgumentException("moveCode is not divisible by 3, 5, or 7)");
+      }
    }
    
    private int[] getTowers(int towersCode){
       int[] towers = new int[2];
       
       switch(Math.abs(towersCode)){
-         case 1:
+         case 3:
             towers[0] = 1;
             towers[1] = 2;
             break;
-         case 2:
+         case 5:
             towers[0] = 1;
             towers[1] = 3;
             break;
-         case 3:
+         case 7:
             towers[0] = 2;
             towers[1] = 3;
             break;

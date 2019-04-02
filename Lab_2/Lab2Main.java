@@ -3,19 +3,21 @@ import java.io.FileWriter;
 import java.io.File;
 import java.io.IOException;
 
+
 class Lab2Main
 {
 
    public static void main( String[] args ){
       String method, outputFile;
       String targetTower;
-      String moveList;
       
       Timer timer = new Timer("Time it");
       File tempSolutionFile;
 
       int numDiscs;
-      boolean optimize;     
+      long numMoves;
+      boolean optimize;
+      BetterMoveEncoder encoder = new BetterMoveEncoder(1);     
       
       // Try parsing arguments
       if(args.length < 3){
@@ -28,10 +30,7 @@ class Lab2Main
       optimize = getOptimizeSetting(args);
      
       targetTower = "C";
-      
-      if(numDiscs == 1) {
-         // DO SOMETHING HERE FOR EDGE CASE.
-      }
+      numMoves = MathHelpers.exponentiate(2, numDiscs) - 1;      
       
       
       
@@ -50,12 +49,14 @@ class Lab2Main
             // Solve the problem
             if(method.equals("recursive")){
                RecursiveTowers tower = new RecursiveTowers(numDiscs, targetTower, tempFileWriter, optimize);
-               tower.solve();
-               moveList = tower.getMoveList();
+               if(optimize){
+                  encoder = tower.solve(optimize);               
+               } else {
+                  tower.solve();              
+               }
             } else { // method.equals("iterative");
                ImprovedIterativeTowers tower = new ImprovedIterativeTowers(numDiscs, targetTower, tempFileWriter);
                tower.solve();
-               moveList = tower.getMoveList();
             }
             
             // Stop the timer
@@ -72,17 +73,21 @@ class Lab2Main
                outputFileWriter.write("***********************************\n***********************************\n");
                outputFileWriter.write("Number of Discs: " + numDiscs + "\n");
                outputFileWriter.write("Method of Solving: " + method + "\n");
-               outputFileWriter.write("Total moves: " + "____TODO_____\n");
+               outputFileWriter.write("Total moves: " + numMoves +"\n");
                outputFileWriter.write("Time to solve: " + timer.getElapsedSeconds() + "seconds.\n");
                outputFileWriter.write("\nSolution:\n");
                
-               try(FileReader solutionFile = new FileReader(tempSolutionFile)){
-                  int input;
-                  while ((input = solutionFile.read()) != -1){
-                     outputFileWriter.write(input);
+               if(method.equals("recursive") && optimize) {
+                  encoder.saveMovesToFile(outputFileWriter);
+               } else {               
+                  try(FileReader solutionFile = new FileReader(tempSolutionFile)){
+                     int input;
+                     while ((input = solutionFile.read()) != -1){
+                        outputFileWriter.write(input);
+                     }
+                  } catch (IOException except) {   // Reading solution file
+                     System.out.println("Error: There was a problem reading the solution temp file:\n\t" + except.getMessage());
                   }
-               } catch (IOException except) {   // Reading solution file
-                  System.out.println("Error: There was a problem reading the solution temp file:\n\t" + except.getMessage());
                }
                
             } catch (IOException except){ //Writing output to file

@@ -12,11 +12,13 @@ class RecursiveTowers{
    private final int DUMP_LIMIT = 100000;
    
    private boolean optimize;
-   private Memoizer moveMemory;
+   private BetterMemoizer moveMemory;
+   private BetterMoveEncoder[] moves;
+   private int movesPosition;
    
    RecursiveTowers(int numDiscs, String targetTower, FileWriter outputFile, boolean optimize){
       this.numDiscs = numDiscs;
-      this.moveMemory = new Memoizer(numDiscs);
+      this.moveMemory = new BetterMemoizer(numDiscs);
       
       this.startTower = "A";
       this.targetTower = targetTower;
@@ -26,7 +28,12 @@ class RecursiveTowers{
       this.outputFile = outputFile;
       this.outputCounter = 0;
       
-      this.optimize = optimize;
+      if(optimize){
+         this.optimize = optimize;
+         this.moves = new BetterMoveEncoder[1000000000];
+         this.movesPosition = 0;
+      }
+      
    }
    
    public void solve() throws IOException{
@@ -34,38 +41,53 @@ class RecursiveTowers{
       this.dumpOutput(0);
    }
    
+   public BetterMoveEncoder solve(boolean opitmize) throws IOException{
+      return moveDiscs(this.numDiscs, this.startTower, this.tempTower, this.targetTower, true);
+   }
+   
    public String getMoveList(){
       return this.output;
    }
 
-   private String moveDiscs(int numDiscs, String start, String temp, String end) throws IOException {
-      if (this.optimize && this.moveMemory.moveStored(numDiscs, start, end)) {
-         String moves = this.moveMemory.getMoves(numDiscs, start, end);
-         this.outputFile.write(moves);
-         return moves;
-         
+   private void moveDiscs(int numDiscs, String start, String temp, String end) throws IOException {        
+      if (numDiscs == 1){
+         // Base case of 1 disc--just move it to its destination
+         makeMove(numDiscs, start, end);
       } else {
-         
-         String outputString = "";
+         // Otherwise, move other discs out of the way, move the disc
+         // to its destination, then move the other discs to their
+         // final desination.
+
+         moveDiscs(numDiscs - 1, start, end, temp);
+         makeMove(numDiscs, start, end);
+         moveDiscs(numDiscs - 1, temp, start, end);
+      }
+   }
+   
+   private BetterMoveEncoder moveDiscs(int numDiscs, String start, String temp, String end, boolean optimize) throws IOException {
+      if (moveMemory.moveStored(numDiscs, start, end)) {
+         BetterMoveEncoder tempMoves = moveMemory.getMoves(numDiscs, start, end);
+         moves[movesPosition++] = tempMoves;
+         return tempMoves;
+      } else {
+         BetterMoveEncoder encoder = new BetterMoveEncoder(numDiscs);
          if (numDiscs == 1){
             // Base case of 1 disc--just move it to its destination
-            outputString += makeMove(numDiscs, start, end);
+            encoder.addMove(numDiscs, start, end);
          } else {
             // Otherwise, move other discs out of the way, move the disc
             // to its destination, then move the other discs to their
             // final desination.
    
-            outputString += moveDiscs(numDiscs - 1, start, end, temp);
-            outputString += makeMove(numDiscs, start, end);
-            outputString += moveDiscs(numDiscs - 1, temp, start, end);
+            encoder.addMoves(moveDiscs(numDiscs - 1, start, end, temp, true));
+            encoder.addMove(numDiscs, start, end);
+            encoder.addMoves(moveDiscs(numDiscs - 1, temp, start, end, true));
+            
+            // Add the calculated moves to the Memoizer
+            moveMemory.setMoves(numDiscs, start, end, encoder);
          }
          
-         dumpOutput(this.DUMP_LIMIT);
-         if(this.optimize && !this.moveMemory.moveStored(numDiscs,start, end)){
-            moveMemory.setMoves(numDiscs, start, end, outputString);
-         }
-         
-         return outputString;
+         return encoder;
       }
    }
 
