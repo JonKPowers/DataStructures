@@ -4,15 +4,35 @@ import java.io.IOException;
 
 class BetterMoveEncoder
 {
-
-   // Tower encoding table:
-   // startTower     endTower    moveCode
-   // A(0)           B(1)        1
-   // B(1)           A(0)        -1
-   // A(0)           C(2)        2
-   // C(3)           A(0)        -2
-   // B(1)           C(2)        3
-   // C(2)           B(1)        -3
+   /**
+   ** The BetterMoveEncoder class provides a mechanism to store move sequences
+   ** and convert them to human-readable strings. It attempts to extend the range
+   ** of moves that can be stored compared to full Strings. This is necessary
+   ** because the large number of moves required to solve even relatively small
+   ** Towers of Hanoi problems can be enormous. Using and concatenating Strings
+   ** to track these move sequences is very expensive.
+   **
+   ** Moves are tracked using two parallel arrays, with each move being
+   ** represented by the same index in each array. One array holds the
+   ** disc invovled in the move, using its natural number ordering. The
+   ** second array contains a move code. Each unique combination of
+   ** towers is given a code, and the movement is from the "lower"
+   ** tower to the "higher" tower if the code is positive and negative
+   ** if the move is "downward":
+   **
+   ** Tower encoding table:
+   ** startTower     endTower    moveCode
+   ** A(0)           B(1)        3
+   ** B(1)           A(0)        -3
+   ** A(0)           C(2)        5
+   ** C(3)           A(0)        -5
+   ** B(1)           C(2)        7
+   ** C(2)           B(1)        -7
+   **
+   ** For purposes of all public methods of this class, Tower A has the
+   ** integer identifier 0, Tower B has the identifier 1, and Tower C
+   ** has the identifier 2.
+   **/
 
    private int[][] moveList;
    private int[][] discList;
@@ -23,7 +43,19 @@ class BetterMoveEncoder
    
    final int MAX_ARRAY_SIZE = 100000000;
 
+   /////////////////////////
+   // Constructor
+   /////////////////////////
+
    BetterMoveEncoder(int numDiscs){
+      /**
+      ** This constructor tries to make arrays of an appropriate size to
+      ** hold the TOH solution for the numDiscs being solved for. Due to
+      ** the enormous size of the TOH solutions, this approach results in
+      ** Heap capacity issues when n=30 or higher. Further optimizations
+      ** could extend the functionality of this, which is the major
+      ** bottleneck and limiting feature of this move-storage structure.
+      **/
       long totalMoves = MathHelpers.exponentiate(2, numDiscs) - 1;
       int totalArrays = (int) (totalMoves / MAX_ARRAY_SIZE) + 1;
       
@@ -35,25 +67,26 @@ class BetterMoveEncoder
       mainArrayIndex = 0;
       subArrayIndex = 0;   
    }
-   
-   private void setUpStorageArrays(long numMoves){
-      mainArrayIndex = 0;
-      while(numMoves >= MAX_ARRAY_SIZE){
-         this.moveList[mainArrayIndex] = new int[MAX_ARRAY_SIZE];
-         this.discList[mainArrayIndex] = new int[MAX_ARRAY_SIZE];
-         numMoves -= MAX_ARRAY_SIZE;
-         mainArrayIndex++;
 
-      }
-      this.moveList[mainArrayIndex] = new int[(int) numMoves];
-      this.discList[mainArrayIndex] = new int[(int) numMoves];
-      
-      mainArrayIndex = 0;
-   }
+   /////////////////////////
+   // Public Methods
+   /////////////////////////   
    
    public void addMove(int discNum, int startTower, int endTower){
+      /**
+      ** addMove() adds the movement of a disc from one tower to 
+      ** another tower to the sequence of moves stored in the 
+      ** BetterMoveEncoder. These can later be retrieved or written
+      ** to a file by other methods in this class.
+      **
+      ** @param discNum The integer number of the disc being move
+      ** @param startTower The integer identifier of the starting tower
+      ** @param endTower The integer identifier of the ending tower
+      ** @return None Nothing is returned
+      **/
       int moveCode = getMoveCode(startTower, endTower);
       
+      // Add the move to the two arrays      
       this.moveList[mainArrayIndex][subArrayIndex] = moveCode;
       this.discList[mainArrayIndex][subArrayIndex] = discNum;
       
@@ -67,10 +100,30 @@ class BetterMoveEncoder
    }
    
    public void addMove(int discNum, String startTower, String endTower){
+      /**
+      ** Provides the same functionality as addMove(int, int, int) but
+      ** allows the startTower and endTower to be identified by a 
+      ** String such as "A", "B", or "C" rather than by using the
+      ** tower's integer identifier.
+      **
+      ** @param discNum The integer number of the disc being move
+      ** @param startTower The String identifier of the starting tower
+      ** @param endTower The String identifier of the ending tower
+      ** @return nothing is returned     
+      **/
       addMove(discNum, towerToInt(startTower), towerToInt(endTower));
    }
    
    public void addMoves(BetterMoveEncoder sourceMoves){
+      /**
+      ** addMoves() takes in another BetterMoveEncoder object and
+      ** adds the move sequence contained in the BetterMoveEncoder
+      ** object to the moves stored in this current object.
+      **
+      ** @param sourceMoves The BetterMoveEncoder object whose moves are to be added to the current object
+      ** @return None Nothing is returned
+      **
+      **/
       int[] encodedMove;
       int[] towers;
       
@@ -84,6 +137,19 @@ class BetterMoveEncoder
    }
    
    public int[] getMove(){
+      /**
+      ** getMove() is an iterator function that will continue to return individual
+      ** moves, one at a time from the current BetterMoveEncoder 
+      ** object until all moves have been returned. The end of the moves is signaled
+      ** by an int[] array of length zero.
+      **
+      ** The int[] array contains two elements: the first is the disc involved in
+      ** the move; the second is the move code associated with the move.
+      **
+      ** @return int[] An int[] array containing the disc number and move code for the next move in this BetterMoveEncoder object
+      **
+      **
+      **/
       int[] moves = new int[2];
       
       // If we've gone past the last entry, return empty array; reset counters
@@ -99,22 +165,19 @@ class BetterMoveEncoder
          return moves;
       }
    }
+
    
-   public void resetGetMoves(){
-      this.getMovesMainArrayIndex = 0;
-      this.getMovesSubArrayIndex = 0;
-   }
-   
-   private void incrementGetMoves(){
-      if(this.getMovesSubArrayIndex == (this.MAX_ARRAY_SIZE - 1)){
-         this.getMovesSubArrayIndex = 0;
-         this.getMovesMainArrayIndex++;
-      } else {
-         this.getMovesSubArrayIndex++;
-      }
-   }
+
    
    public void saveMovesToFile(FileWriter outputFile) throws IOException {
+      /**
+      ** saveMovesToFile() takes in a FileWriter object and writes the
+      ** moves stored in the current BetterMoveEncoder object to the file
+      ** in a human-friendly format. 
+      **
+      ** @param outputFile A FileWriter object associated with the output file to write to
+      **
+      **/
       int mainArraySize = this.mainArrayIndex + 1;
       int lastSubArraySize = this.subArrayIndex;
       
@@ -131,7 +194,72 @@ class BetterMoveEncoder
       }
    }
 
+   /////////////////////////
+   // Private Methods
+   /////////////////////////
+      
+   private void setUpStorageArrays(long numMoves){
+      /**
+      ** setUpStorageArrays() is used to initalize the arrays used to store
+      ** disc and moveCode information for each move contained in the
+      ** BetterMoveEncoder object.
+      **
+      ** @param numMoves The number of moves that the BetterMoveEncoder will store
+      ** @return None Nothing is returned.
+      **/
+      mainArrayIndex = 0;
+      while(numMoves >= MAX_ARRAY_SIZE){
+         this.moveList[mainArrayIndex] = new int[MAX_ARRAY_SIZE];
+         this.discList[mainArrayIndex] = new int[MAX_ARRAY_SIZE];
+         numMoves -= MAX_ARRAY_SIZE;
+         mainArrayIndex++;
+
+      }
+      this.moveList[mainArrayIndex] = new int[(int) numMoves];
+      this.discList[mainArrayIndex] = new int[(int) numMoves];
+      
+      mainArrayIndex = 0;
+   }
+
+   private void incrementGetMoves(){
+      /**
+      ** incrementGetMoves() is used to increment the counters used
+      ** to track the top of the move arrays. Multiple arrays are used
+      ** to attempt to handle the potentially enormous number of moves
+      ** that might have to be stored, which requires some coordination
+      ** of the couters for the 1st dimension of the array and the 
+      ** 2nd dimension.
+      **/
+      if(this.getMovesSubArrayIndex == (this.MAX_ARRAY_SIZE - 1)){
+         this.getMovesSubArrayIndex = 0;
+         this.getMovesMainArrayIndex++;
+      } else {
+         this.getMovesSubArrayIndex++;
+      }
+   }
+
+   
+   private void resetGetMoves(){
+      /**
+      ** resetGetMoves() resets the move counter used by getMove(). This
+      ** is automatically triggered when the getMove() iterator exhausts
+      ** all the moves contained in the current BetterMoveEncoder object.
+      **
+      ** @return None Nothing is returned
+      **/
+      this.getMovesMainArrayIndex = 0;
+      this.getMovesSubArrayIndex = 0;
+   }
+
    private int getMoveCode(int startTower, int endTower){
+      /**
+      **
+      **
+      **
+      **
+      **
+      **
+      **/
       if(startTower < 0 || endTower < 0){
          throw new IllegalArgumentException("Invalid start/end tower passed to moveEncoder.encode().");
       }
@@ -148,6 +276,15 @@ class BetterMoveEncoder
    }
          
    private String decodeToString(int discCode, int moveCode){
+      /**
+      ** decodeToString() translates a disc number and a moveCode into
+      ** a human-readable String.
+      **
+      ** @param discCode The integer identifier of the disc being moved
+      ** @param moveCode The moveCode describing the move being made
+      ** @return String The human-friendly String describing the move
+      **
+      **/
       String decodedString = "";
       
       int[] towers = getTowers(moveCode);
@@ -162,6 +299,15 @@ class BetterMoveEncoder
 
    
    private int[] getTowers(int towersCode){
+      /**
+      ** getTowers() decodes a move code into the towers represented
+      ** in the move and the direction of the move. It returns an integer
+      ** array, with the first element being the starting tower and the 
+      ** second element being the destination tower. 
+      **
+      ** @param towersCode The move code representing the move
+      ** @return int[] An array with the starting tower as the first element and the ending tower as the second
+      **/
       int[] towers = new int[2];
       
       switch(Math.abs(towersCode)){
@@ -183,6 +329,14 @@ class BetterMoveEncoder
    }
    
    private String towerToString(int towerCode){
+      /**
+      ** towerToString() provides a translation of a tower's integer
+      ** identifier into a human-friendly String representation.
+      **
+      ** @param towerCode The tower's integer identifier
+      ** @return String A human-friendly String representation of the tower identifier
+      **
+      **/
       if(towerCode == 0){
          return "Tower A";
       } else if (towerCode == 1){
@@ -195,6 +349,14 @@ class BetterMoveEncoder
    }
    
    private int towerToInt(String towerCode){
+      /**
+      ** towerToInt() provides a translation of a tower's short-form String
+      ** identifier into its integer representation.
+      **
+      ** @param towerCode The tower's short-form String identifier
+      ** @return int The tower's integer identifier
+      **
+      **/
       if(towerCode.equals("A")){
          return 0;
       } else if(towerCode.equals("B")){
