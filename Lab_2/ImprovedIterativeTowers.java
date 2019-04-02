@@ -105,11 +105,8 @@ class ImprovedIterativeTowers
       while(this.currentMove <= this.numMoves){
          int[] moves = getMovePair();
          makeMove(moves[0], moves[1]);
-         dumpOutput(100000);
          this.currentMove++;
       }
-      
-      dumpOutput(0);
    }
    
    public String getMoveList(){
@@ -134,7 +131,7 @@ class ImprovedIterativeTowers
    ******************************
    ******************************/
 
-   private void makeMove(int startingTower, int targetTower){
+   private void makeMove(int startingTower, int targetTower) throws IOException {
       /**
       ** makeMove() moves the disc on top of the startingTower to the targetTower.
       ** It updates the appropriate tower IntStacks and [_____________________].
@@ -146,7 +143,7 @@ class ImprovedIterativeTowers
       **/      
       int discNum = this.towers[startingTower].peek();
       this.towers[targetTower].push(this.towers[startingTower].pop());
-      this.output += "Move disc " + discNum + " from Tower " + getTowerString(startingTower) + " to Tower " + getTowerString(targetTower) + "\n";
+      this.outputFile.write("Move disc " + discNum + " from Tower " + getTowerString(startingTower) + " to Tower " + getTowerString(targetTower) + "\n");
    }
    
    private int[] getMovePair(){
@@ -216,15 +213,5 @@ class ImprovedIterativeTowers
    
    private String getTowerString(int towerNum){
       return this.towerStrings[towerNum];
-   }
-   
-   private void dumpOutput(int maxBuffered)throws IOException{
-      if (this.outputCounter > maxBuffered) {
-         this.outputFile.write(this.output);
-         this.outputCounter = 0;
-         this.output = "";
-      }
-      
-      this.outputCounter++;
    }
 }

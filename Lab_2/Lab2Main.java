@@ -6,37 +6,61 @@ import java.io.IOException;
 
 class Lab2Main
 {
+   /**
+   ** Lab2Main is the driver class for the JHU Data Structures Lab 2 assignment.
+   ** It computes a solution to the Towers of Hanoi problem, using either an
+   ** iterative or recursive approach, depending on the command-line arguments
+   ** supplied by the user. In addition, it provides a memoization mechanism that
+   ** can be enabled for the recursive solution.
+   **
+   ** @author Jon Powers
+   ** @version 0.1
+   **
+   **/
 
    public static void main( String[] args ){
+      /**
+      ** main() contains the primary logic of the Lab 2 driver. It's main
+      ** responsibilty is to parse the command-line arguments, set up the
+      ** environment, and call the appropriate methods to generate a solution
+      ** to the Towers of Hanoi problem.
+      **
+      ** Usage: java Lab2Main solve_method output_file ["optimize"]
+      **        solve_method: either "iterative" or "recursive"        
+      **        output_file: the name of the file to write the solution to
+      **        "optimize": if specified (without quotes), memoization will be enabled for recursion
+      **/
+
+      // Variables for command-line argument info      
       String method, outputFile;
       String targetTower;
-      
-      Timer timer = new Timer("Time it");
-      File tempSolutionFile;
+      boolean optimize;      
 
+      // Variables for information about the TOH problem
       int numDiscs;
       long numMoves;
-      boolean optimize;
+      
+      // Helpers used while solving the TOH problem
+      Timer timer = new Timer("Time it");
+      File tempSolutionFile;
       BetterMoveEncoder encoder = new BetterMoveEncoder(1);     
       
       // Try parsing arguments
       if(args.length < 3){
          badArguments("Wrong number of arguments");
-      }
-      
+      }      
       method = getSolveMethod(args);
       numDiscs = getNumDiscs(args);
       outputFile = getOutputFile(args);
       optimize = getOptimizeSetting(args);
      
-      targetTower = "C";
+      // Some misc variables with information about the problem
+      targetTower = "C";      // Can be set up to use "B" as the targetTower as well
       numMoves = MathHelpers.exponentiate(2, numDiscs) - 1;      
       
-      
-      
-
-      
+      ////////////////////////////////////
       // Solve the Towers of Hanoi problem
+      ////////////////////////////////////
       try {
          tempSolutionFile = File.createTempFile("TOHSolution", ".tmp");
          tempSolutionFile.deleteOnExit();
@@ -73,8 +97,11 @@ class Lab2Main
                outputFileWriter.write("***********************************\n***********************************\n");
                outputFileWriter.write("Number of Discs: " + numDiscs + "\n");
                outputFileWriter.write("Method of Solving: " + method + "\n");
+               if(method.equals("recursion")){
+                  outputFileWriter.write("Optimization: " + (optimize ? "enabled" : "disabled") + "\n");
+               }
                outputFileWriter.write("Total moves: " + numMoves +"\n");
-               outputFileWriter.write("Time to solve: " + timer.getElapsedSeconds() + "seconds.\n");
+               outputFileWriter.write("Time to solve: " + timer.getElapsedSeconds() + " seconds\n");
                outputFileWriter.write("\nSolution:\n");
                
                if(method.equals("recursive") && optimize) {

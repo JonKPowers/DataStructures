@@ -38,7 +38,6 @@ class RecursiveTowers{
    
    public void solve() throws IOException{
       moveDiscs(this.numDiscs, this.startTower, this.tempTower, this.targetTower);
-      this.dumpOutput(0);
    }
    
    public BetterMoveEncoder solve(boolean opitmize) throws IOException{
@@ -91,16 +90,7 @@ class RecursiveTowers{
       }
    }
 
-   private String makeMove(int numDiscs, String start, String end){
-      String outputString = "Move disc " + numDiscs + " from Tower " + start + " to Tower " + end + "\n";
-      this.output += outputString;
-      return outputString;
-   }
-   
-   private void dumpOutput(int maxBuffered)throws IOException{
-      if (this.output.length() > maxBuffered) {
-         this.outputFile.write(this.output);
-         this.output = "";
-      }
+   private void makeMove(int numDiscs, String start, String end) throws IOException {
+      this.outputFile.write("Move disc " + numDiscs + " from Tower " + start + " to Tower " + end + "\n");
    }
 }
