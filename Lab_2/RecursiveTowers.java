@@ -5,7 +5,7 @@ class RecursiveTowers{
    /**
    ** The RecursiveTowers class implements a recursive solution to the Towers
    ** of Hanoi problem. It's basic operation follows the simple strategy moving
-   ** all the discs under the target disc onto a temporary tower, moving the
+   ** all the discs on top of the target disc onto a temporary tower, moving the
    ** target disc onto its target tower, and then moving the discs from the
    ** temporary tower onto the target tower.
    **
