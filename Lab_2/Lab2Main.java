@@ -65,7 +65,7 @@ class Lab2Main
          tempSolutionFile = File.createTempFile("TOHSolution", ".tmp");
          tempSolutionFile.deleteOnExit();
          
-         try(FileWriter tempFileWriter = new FileWriter("TempFileDELETEME" + method + (optimize ? "optimized" : "") + ".tmp")){
+         try(FileWriter tempFileWriter = new FileWriter(tempSolutionFile)){
          
             // Start the timer
             timer.start();
