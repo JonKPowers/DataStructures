@@ -21,19 +21,23 @@ class FreqTableHandler
        ** number of lines in the frequency table (one per line).
        **
        ** Entries in the frequency table must be in the form [A-Za-Z]\D*[0-9]+ and
-       ** failure to conform to this will cause the program to ignore that line
-       ** entirely. Note that \D in this context does not include negated underscore.
-       ** If a required character is skipped for this reason, it will cause the
-       ** incorrect code key to be generated and will most likely end up throwing an
-       ** EncodingException when the program goes to encode or decode the message.
+       ** failure to conform to this will generally cause an EncodingException to be
+       ** thrown, which will result in the program exiting prematurely.
+       ** Note that \D in this context does not include negated underscore.
+       ** We chose to exit the program rather than simply ignore that line because
+       ** it's unlikely that we'll be able to generate a correct code key if there
+       ** was an error in the frequency table that prevented us from reading data
+       ** on one of the keys. One way or another, this is almost certain to cause
+       ** an issue later when trying to encode or decode a message. So we cut things off
+       ** early rather than keep trudging down a futile path.
        **
        ** @param fileName The name of the file containing the frequencyTable.
        **
        **/
       int totalChars = getNumLines(fileName);
-      String[] characterLIst = new String[totalChars];
-      int[] frequencyList = new int[totalChars];
-      
+
+      HuffmanNode[] codes = parseFile(fileName);      
+
       return new PriorityQueue(10);
       
    }
@@ -127,6 +131,10 @@ class FreqTableHandler
             // and add the node to codes[].
             } else if(character == '\n') {
                
+               // If we've parsed a line without getting data, just move on
+               if(stringCharacter.equals("") && stringFrequency.equals("")){
+                  continue;
+               }
                
                // Error checking--Errors will throw an EncodingException. It's unlikely
                // that encoding/decoding will be successful if there's an error in the
@@ -146,6 +154,8 @@ class FreqTableHandler
                   errorString += stringCharacter + "\" contains more than one character.";
                   throw new EncodingException(errorString); 
                }
+               
+               // 
 
                codes[nodeCounter] = new HuffmanNode(stringCharacter, frequency);
 
