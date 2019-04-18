@@ -36,9 +36,15 @@ class FreqTableHandler
        **/
       int totalChars = getNumLines(fileName);
 
-      HuffmanNode[] codes = parseFile(fileName);      
+      HuffmanNode[] codes = parseFile(fileName);
+      PriorityQueue priorityQueue = new PriorityQueue(codes.length);
+      
+      for(HuffmanNode node: codes){
+         if(node == null) {continue;}
+         priorityQueue.push(node);
+      }
 
-      return new PriorityQueue(10);
+      return priorityQueue;
       
    }
 

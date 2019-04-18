@@ -8,6 +8,10 @@ class TestHuffmanNodes
       assert newNode.getFrequency() == 5;
       assert newNode.getChars() == "A";
       assert newNode.isMultiChar() == false; 
+      
+      HuffmanNode smallerNode = new HuffmanNode("B", 16);
+      HuffmanNode biggerNode = new HuffmanNode("I", 16);
+      smallerNode.isLessThan(biggerNode);
    }
    
 }

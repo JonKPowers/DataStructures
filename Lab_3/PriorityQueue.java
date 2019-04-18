@@ -46,8 +46,19 @@ class PriorityQueue
 
        return heapSize == 0;
    }
+   
+   public boolean hasMoreThanOneItem(){
+      /**
+      ** hasMoreThanOneItem() determines whether there is more than one 
+      ** item currently in the PriorityQueue.
+      **
+      ** @return boolean True if there is more than one item in the PriorityQueue; otherwise false
+      **/
+      
+      return heapSize > 1;
+   }
 
-   public int getSize(){
+   public int getLength(){
       /**
        ** getSize() determines the number of items currently in the PriorityQueue.
        **
@@ -99,8 +110,8 @@ class PriorityQueue
    // Private Methods
    //////////////////////////////
 
-   private boolean lessThan(int i, int j){
-      return heap[i].isLessThan(heap[j]);
+   private boolean moreThan(int i, int j){
+      return !heap[i].isLessThan(heap[j]);
    }
 
    private void bubbleUp(int nodeIndex){
@@ -108,12 +119,12 @@ class PriorityQueue
        ** bubbleUp() provide a mechanism for correcting the heap order when an
        ** out-of-order item is located towards the bottom of the heap. The
        ** item is repeatedly exchanged with its parent until it is no longer
-       ** larger than its immediate parent.
+       ** smaller than its immediate parent.
        **
        ** @param nodeIndex The array index of the item to place into the correct heap position
        **/
       
-      while(nodeIndex > 1 && lessThan(nodeIndex/2, nodeIndex)){
+      while(nodeIndex > 1 && moreThan(nodeIndex/2, nodeIndex)){
          // Swap the node with its parent, then move up and repeat
          swap(nodeIndex, nodeIndex/2);
          nodeIndex = nodeIndex/2;
@@ -121,17 +132,24 @@ class PriorityQueue
    }
 
    private void pushDown(int nodeIndex){
-      // Continue pushing the node down until it hits the bottom
+      /**
+      ** pushDown() provides a mechanism for correcting the heap order when an
+      ** out-of-order item is located towards the top of the heap. The item is
+      ** repeatedly exchanged with its smallest child until it is no longer larger
+      ** than either of its children. 
+      **
+      ** @param nodeIndex The array index of the itme to place into the correct heap position
+      **/
       while(nodeIndex * 2 <= heapSize){
-         // Find the child with the highest value
+         // Find the child with the smallest value
          int child = nodeIndex * 2;
-         if(child < heapSize && lessThan(child, child + 1)){
+         if(child < heapSize && moreThan(child, child + 1)){
             child++;
          }
-         // If the child is less than the current node, swap them and
+         // If the current node is more than the child, swap them and
          // move down the tree; otherwise, the node is in the right 
          // place, and we're done.
-         if(lessThan(nodeIndex, child)){
+         if(moreThan(nodeIndex, child)){
             swap(nodeIndex, child);
             nodeIndex = child;
          } else {

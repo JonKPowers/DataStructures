@@ -4,11 +4,32 @@ class HuffmanNode
    private int frequency;
    private String characters;
    private boolean multiChar;
+   private boolean isLeftChild;
+   private HuffmanNode parent;
+   private HuffmanNode leftChild;
+   private HuffmanNode rightChild;
 
    HuffmanNode(String characters, int frequency){
       this.frequency = frequency;
       this.characters = characters;
-      this.multiChar= characters.length() > 1;
+      this.multiChar = characters.length() > 1;
+      this.isLeftChild = false;
+      this.parent = null;
+      this.leftChild = null;
+      this.rightChild = null;
+   }
+   
+   HuffmanNode(HuffmanNode leftChild, HuffmanNode rightChild){
+      this.frequency = leftChild.getFrequency() + rightChild.getFrequency();
+      this.characters = leftChild.getChars() + rightChild.getChars();
+      this.multiChar = characters.length() > 1;
+      this.isLeftChild = false;
+      this.parent = null;
+      leftChild.setAsLeftChild(true);
+      leftChild.setParent(this);
+      this.leftChild = leftChild;
+      rightChild.setParent(this);
+      this.rightChild = rightChild;
    }
 
    public int getFrequency(){
@@ -21,6 +42,26 @@ class HuffmanNode
 
    public boolean isMultiChar(){
       return this.multiChar;
+   }
+   
+   public boolean isLeaf(){
+      return !this.multiChar;
+   }
+   
+   public HuffmanNode getParent(){
+      return this.parent;
+   }
+   
+   public void setParent(HuffmanNode parent){
+      this.parent = parent;
+   }
+   
+   public void setAsLeftChild(boolean isLeftChild){
+      this.isLeftChild = isLeftChild;
+   }
+   
+   public boolean isLeft(){
+      return this.isLeftChild;
    }
 
    public boolean isLessThan(HuffmanNode otherNode){
@@ -45,7 +86,7 @@ class HuffmanNode
       if(result == 0){
          result = this.characters.compareTo(otherNode.getChars());    
       }
-      return result == -1 ? true : false;
+      return result < 0 ? true : false;
    }
 
    public String toString(){
