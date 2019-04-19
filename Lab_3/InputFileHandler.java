@@ -44,6 +44,23 @@ class InputFileHandler
       }
       
    }
+   
+   public static boolean ignoreCharacter(int character){
+      /**
+      ** ignoreCharacter() provides a filter for characters that we want to ignore.
+      ** It generally ignores all nonprinting characters and characters outside
+      ** the Latin Basic portion of the UTF code set (<20 or >126).
+      **
+      ** @param character Integer value of the character being evaluated.
+      ** @return boolean True if the character should be skipped; otherwise false
+      **/
+      
+      //Ignore the control characters
+      if(character < 20 || character >126) return true;
+      
+      // Everything else is processed
+      return false;
+   }
 
    public static StringStackDataPack[] getLinesFromFileAsStacks(String fileName){
       /**
@@ -110,7 +127,7 @@ class InputFileHandler
                comments = "";
                optimizeOn = false;
                optimizeOff = false;
-            } else if(character < 20 || character == 32){   
+            } else if(ignoreCharacter(character)){   
                continue;
                
             // Normal characters go onto tempStack until we hit a newline   

@@ -45,11 +45,19 @@ class HuffmanNode
    }
    
    public boolean isLeaf(){
-      return !this.multiChar;
+      return this.leftChild == null && this.rightChild==null;
    }
    
    public HuffmanNode getParent(){
       return this.parent;
+   }
+   
+   public HuffmanNode getLeftChild(){
+      return this.leftChild;
+   }
+   
+   public HuffmanNode getRightChild(){
+      return this.rightChild;
    }
    
    public void setParent(HuffmanNode parent){

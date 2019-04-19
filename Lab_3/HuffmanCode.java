@@ -1,5 +1,9 @@
 class HuffmanCode
 {
+   /**
+   ** The HuffmanCode class provides a simple container to hold clear-text
+   ** characters as well as their computed HuffmanCode.
+   **/
 
    private String character;
    private String code;
@@ -15,7 +19,7 @@ class HuffmanCode
 
 
    /////////////////////////
-   // Public Methods
+   // Public Methods--They do what they say
    /////////////////////////
    
    public String getCharacter(){
@@ -25,10 +29,4 @@ class HuffmanCode
    public String getCode(){
       return this.code;
    }
-   
-   
-   /////////////////////////
-   // Private Methods
-   /////////////////////////      
-
 }

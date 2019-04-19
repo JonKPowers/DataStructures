@@ -79,11 +79,26 @@ class FreqTableHandler
    }
 
    public static String charToString(int character){
+      /**
+      ** charToString() converts a Integer character value to a String. It's
+      ** a goofy workaround to avoid using String methods.
+      **
+      ** @param character Integer value of the character to be converted to a String.
+      ** @return String The String representation of character
+      **/
       char[] tempChar = {(char) character};
       return new String(tempChar);
    }
 
    public static boolean ignoreChar(int character){
+      /**
+      ** ignoreChar() provides a filter to determine what characters should
+      ** be ignored. Used to filter out junk data in the input file.
+      **
+      ** @param character Integer value of the character to be evaluated.
+      ** @return boolean True if we should ignore the character; otherwise false
+      **/
+      
       // Whitespace is ignored
       if(character < 20 || character == 32){
          return true;
@@ -98,10 +113,24 @@ class FreqTableHandler
    }
 
    public static boolean isDigit(int character){
+      /**
+      ** isDigit() attempts to determine whether a particular character
+      ** is a numerical digit.
+      **
+      ** @param character Integer value of a character
+      ** @return boolean True if character is a digit; otherwise, false
+      **/
       return character >= 48 && character <= 57;
    }
    
    public static boolean isLetter(int character){
+      /**
+      ** isLetter() attempts to determine whether a particular character is
+      ** a letter.
+      **
+      ** @param character Integer value of a character
+      ** @return boolean True if character is a letter; otherwise, false
+      **/
       return (character >=65 && character <=90) || (character >= 97 && character <= 122);
    }
 
