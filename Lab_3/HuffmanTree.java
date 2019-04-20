@@ -44,31 +44,6 @@ class HuffmanTree
       return encodedString;
    }
    
-   public String encode(String searchCharacter){
-      /**
-      ** encode() attempts to find the Huffman code for the provided searchCharacter.
-      ** If no code is found, an empty string is returned.
-      ** 
-      ** @param searchCharacter A String containing the character we want to find the code for.
-      ** @return String A String containing the Huffman code for searchCharacter; if not found, an empty Stringge
-      **/
-      int currentNode = 1;
-      
-      while(binaryCodeTree[currentNode] != null && !(currentNode > (binaryCodeTree.length - 1))){
-         // If we have a match return the code
-         if(isMatch(currentNode, searchCharacter)){
-            return binaryCodeTree[currentNode].getCode();
-         }
-         
-         // Otherwise, determine whether to go left or right down the tree and try again
-         boolean goLeft = searchCharacter.compareTo(binaryCodeTree[currentNode].getCharacter()) == -1;
-         currentNode = goLeft? currentNode * 2 : (currentNode * 2) + 1;
-      }
-      
-      // If the value is not found in our code tree, return an empty String
-      return "";
-   }
-   
    public String decode(StringStack codeString){
       /**
       ** decode() attempts to decode a Huffman encoded string using the Huffman tree
@@ -96,6 +71,19 @@ class HuffmanTree
       return decodedString;
    } 
    
+   public String getPreorderTraversal(){
+      /**
+      ** getPreorderTraversal is a public wrapper for the private recursive traverse()
+      ** method used to generate a preorder traversal of the Huffman tree whose root is
+      ** this.treeRoot. 
+      **
+      ** @return String A String containing the details of the preorder traversal of the Huffman tree
+      **
+      **/
+      return traverse(this.treeRoot);
+   }
+   
+
    
    /////////////////////////
    // Private Methods
@@ -218,6 +206,31 @@ class HuffmanTree
       this.treeRoot = queue.pop(); 
    }
    
+   private String encode(String searchCharacter){
+      /**
+      ** encode() attempts to find the Huffman code for the provided searchCharacter.
+      ** If no code is found, an empty string is returned.
+      ** 
+      ** @param searchCharacter A String containing the character we want to find the code for.
+      ** @return String A String containing the Huffman code for searchCharacter; if not found, an empty Stringge
+      **/
+      int currentNode = 1;
+      
+      while(binaryCodeTree[currentNode] != null && !(currentNode > (binaryCodeTree.length - 1))){
+         // If we have a match return the code
+         if(isMatch(currentNode, searchCharacter)){
+            return binaryCodeTree[currentNode].getCode();
+         }
+         
+         // Otherwise, determine whether to go left or right down the tree and try again
+         boolean goLeft = searchCharacter.compareTo(binaryCodeTree[currentNode].getCharacter()) == -1;
+         currentNode = goLeft? currentNode * 2 : (currentNode * 2) + 1;
+      }
+      
+      // If the value is not found in our code tree, return an empty String
+      return "";
+   }
+   
    private boolean isMatch(int searchNode, String searchCharacter){
       /**
       ** isMatch() checks whether the character represented by the item in
@@ -231,5 +244,25 @@ class HuffmanTree
       **/
       
       return binaryCodeTree[searchNode].getCharacter().equals(searchCharacter);
+   }
+   
+   private String traverse(HuffmanNode currentNode){
+      /**
+      ** preorderTraverse() performs a recursive preorder traversal of the Huffman tree
+      ** whose root is this.treeRoot. A String recording the path of this traversal
+      ** is generated and returned.
+      **
+      ** @return String A String containing the details of the preorder traversal beginnging at currentNode
+      **/
+      String outputString = "";
+      
+      // Base case--currentNode is null; return empty String
+      if(currentNode == null) return outputString;
+      
+      outputString += currentNode.getChars() + ": " + currentNode.getFrequency() + ", ";
+      outputString += traverse(currentNode.getLeftChild());
+      outputString += traverse(currentNode.getRightChild());
+      
+      return outputString;
    }
 }

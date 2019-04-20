@@ -58,7 +58,8 @@ class Lab3Main
                   outputWriter.write("Original size: " + inputString.length() + " characters (" + rawSize + " bytes using UTF-8)\n");
                   outputWriter.write("Encoded size: " + encodedString.length() + " bits (" + compressedSize + " bytes)\n");
                   outputWriter.write("Compression: " + (compressedSize / rawSize * 100) + "%\n");
-                  outputWriter.write("Encoded string: " + encodedString + "\n\n\n");
+                  outputWriter.write("\nPreorder traversal: " + tree.getPreorderTraversal() + "\n");
+                  outputWriter.write("\nEncoded string: " + encodedString + "\n\n\n");
                } catch (EncodingException except){
                   outputWriter.write("Error during encoding: " + except.getMessage());
                }
@@ -72,7 +73,8 @@ class Lab3Main
                   outputWriter.write("Encoded size: " + inputString.length() + " bits (" + compressedSize + " bytes)\n");
                   outputWriter.write("Decoded size: " + decodedString.length() + " characters (" + rawSize + " bytes)\n");
                   outputWriter.write("Compression: " + (compressedSize / rawSize * 100) + "%\n");
-                  outputWriter.write("Decoded string: " + decodedString +"\n\n\n");
+                  outputWriter.write("\nPreorder traversal: " + tree.getPreorderTraversal() + "\n");
+                  outputWriter.write("\nDecoded string: " + decodedString +"\n\n\n");
                } catch (EncodingException except){
                   outputWriter.write("Error during decoding: " + except.getMessage());
                }
