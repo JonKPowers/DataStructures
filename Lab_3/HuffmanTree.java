@@ -31,6 +31,19 @@ class HuffmanTree
    // Public Methods
    /////////////////////////
    
+   public String encodeString(StringStack data){
+      String encodedString = "";
+      while(!data.isEmpty()){
+         String character = data.pop();
+         String encodedCharacter = encode(character);
+         if(encodedCharacter.equals("")){
+            throw new EncodingException(character + " was not found in the encoding tree.");
+         }
+         encodedString += encodedCharacter;
+      }
+      return encodedString;
+   }
+   
    public String encode(String searchCharacter){
       /**
       ** encode() attempts to find the Huffman code for the provided searchCharacter.
@@ -69,8 +82,11 @@ class HuffmanTree
       while(!codeString.isEmpty()){
          HuffmanNode currentNode = treeRoot;
          while(!currentNode.isLeaf()){
-         
-            currentNode = codeString.pop().equals("0") ? currentNode.getLeftChild() : currentNode.getRightChild();
+            try{
+               currentNode = codeString.pop().equals("0") ? currentNode.getLeftChild() : currentNode.getRightChild();
+            } catch (EmptyStackException except) {
+               throw new EncodingException("The encoded string is invalid--does not match code tree");
+            }
          }
          decodedString += currentNode.getChars();
 
