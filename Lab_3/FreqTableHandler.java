@@ -11,7 +11,7 @@ class FreqTableHandler
    **
    **/
    
-   public static PriorityQueue getFrequencies(String fileName){
+   public static PriorityQueue getFrequencies(File file){
       /**
        ** getFrequencies() attempts to parse fileName to extract characters and their
        ** frequencies. Those values are then used to initialized HuffmanNodes, which
@@ -34,9 +34,9 @@ class FreqTableHandler
        ** @param fileName The name of the file containing the frequencyTable.
        **
        **/
-      int totalChars = getNumLines(fileName);
+      int totalChars = getNumLines(file);
 
-      HuffmanNode[] codes = parseFile(fileName);
+      HuffmanNode[] codes = parseFile(file);
       PriorityQueue priorityQueue = new PriorityQueue(codes.length);
       
       for(HuffmanNode node: codes){
@@ -48,7 +48,7 @@ class FreqTableHandler
       
    }
 
-   private static int getNumLines(String fileName){
+   private static int getNumLines(File fileName){
       /**
       ** getNumLines() attempts to determine the number of lines in fileName.
       **
@@ -70,7 +70,7 @@ class FreqTableHandler
          System.out.println("File (" + fileName + ") not found.");
          return 0;
       } catch(SecurityException except) {
-         System.out.println("Error accessing " + fileName+ ": " + except + ". Do you have read access?");
+         System.out.println("Error accessing " + fileName + ": " + except + ". Do you have read access?");
          return 0;
       } catch(IOException except) {
          System.out.println("Error reading input file: " + except + "--no input data retrieved.");
@@ -134,7 +134,7 @@ class FreqTableHandler
       return (character >=65 && character <=90) || (character >= 97 && character <= 122);
    }
 
-   public static HuffmanNode[] parseFile(String fileName) {
+   public static HuffmanNode[] parseFile(File fileName) {
       /**
       **
       ** @param fileName The name of the input file.

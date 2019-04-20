@@ -69,7 +69,8 @@ class HuffmanTree
       while(!codeString.isEmpty()){
          HuffmanNode currentNode = treeRoot;
          while(!currentNode.isLeaf()){
-            currentNode = codeString.pop().equals(0) ? currentNode.getLeftChild() : currentNode.getRightChild();
+         
+            currentNode = codeString.pop().equals("0") ? currentNode.getLeftChild() : currentNode.getRightChild();
          }
          decodedString += currentNode.getChars();
 

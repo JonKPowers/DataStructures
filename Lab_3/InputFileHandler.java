@@ -14,7 +14,7 @@ class InputFileHandler
    **
    **/
    
-   private static int getNumLines(String fileName){
+   private static int getNumLines(File fileName){
       /**
       ** getNumLines() attempts to determine the number of lines in fileName.
       **
@@ -62,7 +62,7 @@ class InputFileHandler
       return false;
    }
 
-   public static StringStackDataPack[] getLinesFromFileAsStacks(String fileName){
+   public static StringStackDataPack[] getLinesFromFileAsStacks(File fileName){
       /**
       ** getLinesFromFileAsStacks() generates an array of StringStackDataPacks, 
       ** each of which holds the contents of a line from the input file along
