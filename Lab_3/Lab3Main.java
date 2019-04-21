@@ -8,6 +8,7 @@ class Lab3Main
    public static void main( String[] args ){
       // Variables for command-line argument info
       String mode;
+      Boolean richText;
       File encodingFile;
       File inputFile;
       String outputFile;
@@ -16,7 +17,7 @@ class Lab3Main
       
       
       // Check that we have the right number of arguments
-      if(args.length != 4){
+      if(args.length < 4){
          System.out.println("Incorrect number of arguments provided: " + args.length);
          System.out.println("Check usage and try again.");
          printUsageAndQuit();
@@ -27,6 +28,7 @@ class Lab3Main
       encodingFile = getEncodingFile(args);
       inputFile = getInputFile(args);
       outputFile = args[3];
+      richText = getRichText(args);
 
       // Build Huffman tree
       tree = new HuffmanTree(FreqTableHandler.getFrequencies(encodingFile));
@@ -38,6 +40,13 @@ class Lab3Main
             if(data == null){ // Skip any null entries that snuck into the datapack array
                continue;
             }
+            
+            // Apply any input-specific configuration
+            mode = data.setModeEncode() ? "encode" : mode;
+            mode = data.setModeDecode() ? "decode" : mode;
+            richText = data.turnRichTextOn() ? true : richText;
+            richText = data.turnRichTextOff() ? false : richText;
+            
             
             // Setup variables and output boilerplate
             StringStack inputDataStack = data.stack;
@@ -79,6 +88,11 @@ class Lab3Main
                   outputWriter.write("Error during decoding: " + except.getMessage());
                }
             }
+            
+         // Put mode and richText variables back to original state for next StringStackDataPack
+         mode = getMode(args);
+         richText = getRichText(args);
+         
          }
       } catch (IOException except){
          System.out.println("There was an error writing the output to file; please check your filename and try again.");
@@ -135,6 +149,26 @@ class Lab3Main
          printUsageAndQuit();
       }
       return inputFile;
+   }
+   
+   private static boolean getRichText(String[] args){
+      /**
+      ** getRichText() parses the command line arguments to determine whether the rich-text enhancement
+      ** has been enabled by the user at the command line. It is disabled by default.
+      **
+      ** @param args The command line arguments passed to the program
+      ** @return boolean True is rich-text enhancements have been enabled; otherwise false
+      **/
+      
+      // If no argument was provided, enhancements are disabled
+      if(args.length < 5) return false;
+      
+      // Enable if passed at the command line
+      if(args[4].toLowerCase().equals("enable")) return true;
+      
+      // Disable by default
+      return false;
+   
    }
 
    public static void printUsageAndQuit(){

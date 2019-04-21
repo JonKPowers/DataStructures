@@ -61,6 +61,18 @@ class InputFileHandler
       // Everything else is processed
       return false;
    }
+   
+   public static String charToString(int character){
+      /** 
+      ** charToString() is a goofy workaround to meet lab requirements prohibiting the use of library methods
+      ** to convert a char to its String equivalent.
+      **
+      ** @param character The character to be converted into a String
+      ** @return String The String representation of the character
+      **/
+      char[] tempChar = {(char) character};
+      return new String(tempChar);
+   }
 
    public static StringStackDataPack[] getLinesFromFileAsStacks(File fileName){
       /**
@@ -81,27 +93,31 @@ class InputFileHandler
          int line = 0;
          CharStack tempStack = new CharStack();
          String comments = "";
-         boolean optimizeOn = false;
-         boolean optimizeOff = false;
+         boolean richTextOn = false;
+         boolean richTextOff = false;
+         boolean modeEncode = false;
+         boolean modeDecode = false;
          
          
          while((character = file.read()) != -1){
             // Lines beginning with # are comments. Skip those lines
             if(character == '#'){
-               while(file.read() != '\n'){}
-               
+               while((character = file.read()) != '\n'){
+                  comments += charToString(character);
+               }
+
             // Lines beginning with > are configuration information to be included in
             // the StringStackDataPack.   
             } else if(character == '>'){
                String configString = "";
                while((character = file.read()) != '\n'){
-                  // Goofy workaround to avoid using library functions to convert char to string
-                  char[] tempChar = {(char) character};
-                  configString += new String(tempChar);
+                  configString += charToString(character);
                }
                switch(configString.toLowerCase()){
-                  case("optimizeon"): optimizeOn = true; break;
-                  case("optimizeoff"): optimizeOff = true; break;
+                  case("rich-text-on"): richTextOn = true; break;
+                  case("rich-text-off"): richTextOff = true; break;
+                  case("decode"): modeDecode = true; break;
+                  case("encode"): modeEncode = true; break;
                   default: comments += configString;
                }
             
@@ -110,8 +126,10 @@ class InputFileHandler
             } else if(character == '\n' && !tempStack.isEmpty()) {
                fileData[line] = new StringStackDataPack();
                fileData[line].comments = comments;
-               fileData[line].optimizeOn = optimizeOn;
-               fileData[line].optimizeOff = optimizeOff;
+               fileData[line].richTextOn = richTextOn;
+               fileData[line].richTextOff = richTextOff;
+               fileData[line].modeDecode = modeDecode;
+               fileData[line].modeEncode = modeEncode;
                
                // Once we hit the end of a line, flush out the contents of 
                // tempStack into the stack of a StringStackDataPack
@@ -125,8 +143,10 @@ class InputFileHandler
                line++;
                tempStack = new CharStack();
                comments = "";
-               optimizeOn = false;
-               optimizeOff = false;
+               richTextOn = false;
+               richTextOff = false;
+               modeEncode = false;
+               modeDecode = false;
             } else if(ignoreCharacter(character)){   
                continue;
                

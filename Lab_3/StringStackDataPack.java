@@ -9,13 +9,31 @@ class StringStackDataPack
    **/
    
    public String comments;
-   public boolean optimizeOn;
-   public boolean optimizeOff;
+   public boolean richTextOn;
+   public boolean richTextOff;
+   public boolean modeEncode;
+   public boolean modeDecode;
    public StringStack stack;
    
    StringStackDataPack(){
       comments = new String();
       stack = new StringStack();
+   }
+   
+   public boolean turnRichTextOn(){
+      return richTextOn == true && richTextOff == false;
+   }
+   
+   public boolean turnRichTextOff(){
+      return richTextOff == true && richTextOn == false;
+   }
+   
+   public boolean setModeEncode(){
+      return modeEncode == true && modeDecode == false;
+   }
+   
+   public boolean setModeDecode(){
+      return modeDecode == true && modeEncode == false;
    }
    
 }
