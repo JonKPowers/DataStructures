@@ -157,7 +157,7 @@ class StringStack
       **
       **/
       String stackString = "";
-      for(int i=0; i<=top; i++){
+      for(int i=top; i>=0; i--){
          stackString += stack[i];
       }
       return stackString;

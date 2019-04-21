@@ -3,7 +3,7 @@ class EncodingException extends RuntimeException
    private String message;
 
    EncodingException(String errorMessage){
-      this.message = message;      
+      this.message = errorMessage;      
    }
    
    public String toString(){

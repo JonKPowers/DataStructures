@@ -105,7 +105,6 @@ class InputFileHandler
                while((character = file.read()) != '\n'){
                   comments += charToString(character);
                }
-
             // Lines beginning with > are configuration information to be included in
             // the StringStackDataPack.   
             } else if(character == '>'){
@@ -134,9 +133,7 @@ class InputFileHandler
                // Once we hit the end of a line, flush out the contents of 
                // tempStack into the stack of a StringStackDataPack
                while(!tempStack.isEmpty()){
-                  // Goofy workaround to avoid using library functions to convert char to string
-                  char[] tempchar = {tempStack.pop()};
-                  fileData[line].stack.push(new String(tempchar));
+                  fileData[line].stack.push(charToString(tempStack.pop()));
                }
                
                // Increment our line counter and reset the temp variables

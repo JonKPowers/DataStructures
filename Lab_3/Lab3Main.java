@@ -53,9 +53,10 @@ class Lab3Main
             String inputString = data.stack.viewStack();
             outputWriter.write("*************************\n*************************\n");
             outputWriter.write("Mode: " + mode + "\n");
+            if(!data.comments.equals("")){
+               outputWriter.write("Comments: " + data.comments + "\n");
+            }
             outputWriter.write("Input: " + inputString + "\n");
-            
-            
             
             // Encode the input file
             if(mode.equals("encode")){
@@ -70,7 +71,7 @@ class Lab3Main
                   outputWriter.write("\nPreorder traversal: " + tree.getPreorderTraversal() + "\n");
                   outputWriter.write("\nEncoded string: " + encodedString + "\n\n\n");
                } catch (EncodingException except){
-                  outputWriter.write("Error during encoding: " + except.getMessage());
+                  outputWriter.write("Error during encoding: " + except.getMessage() + "\n");
                }
             }
             // Or decode the input file
@@ -85,7 +86,7 @@ class Lab3Main
                   outputWriter.write("\nPreorder traversal: " + tree.getPreorderTraversal() + "\n");
                   outputWriter.write("\nDecoded string: " + decodedString +"\n\n\n");
                } catch (EncodingException except){
-                  outputWriter.write("Error during decoding: " + except.getMessage());
+                  outputWriter.write("Error during decoding: " + except.getMessage() + "\n");
                }
             }
             

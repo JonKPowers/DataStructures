@@ -3,7 +3,6 @@ class HuffmanTree
 
    private HuffmanNode[] leafNodes;
    private HuffmanNode treeRoot;
-   private HuffmanNode[] searchTree;
    private HuffmanCode[] codes;
    private HuffmanCode[] binaryCodeTree;
    
@@ -36,9 +35,6 @@ class HuffmanTree
       while(!data.isEmpty()){
          String character = data.pop();
          String encodedCharacter = encode(character);
-         if(encodedCharacter.equals("")){
-            throw new EncodingException(character + " was not found in the encoding tree.");
-         }
          encodedString += encodedCharacter;
       }
       return encodedString;
@@ -60,7 +56,8 @@ class HuffmanTree
             try{
                currentNode = codeString.pop().equals("0") ? currentNode.getLeftChild() : currentNode.getRightChild();
             } catch (EmptyStackException except) {
-               throw new EncodingException("The encoded string is invalid--does not match code tree");
+               EncodingException exception = new EncodingException("The encoded string is invalid--does not match code tree");
+               throw exception;
             }
          }
          decodedString += currentNode.getChars();
@@ -96,16 +93,23 @@ class HuffmanTree
       **
       ** @return HuffmanCode[] A binary tree of HuffmanCode objects contained in an array.
       **/
-      HuffmanCode[] tree = new HuffmanCode[(int) Math.pow(2,leafNodes.length) + 1];
-      tree[1] = codes[0];
-      for(int i=1; i<codes.length; i++){
+      HuffmanCode[] tree = new HuffmanCode[(int) Math.pow(2, leafNodes.length) + 1];
+      int midNode = codes.length / 2;
+      tree[1] = codes[midNode];
+      for(int i=0; i<codes.length; i++){
+         // Since we're setting tree root to midNode, skip it when adding to tree
+         if(i == midNode){
+            continue;
+         }
+         
+         // Start at top of tree
          int currentNodeIndex = 1;
          int nextNodeIndex =1;
          String newCharacter = codes[i].getCharacter();
          
          do{
             currentNodeIndex = nextNodeIndex;
-            if(newCharacter.compareTo(tree[currentNodeIndex].getCharacter()) == -1){
+            if(newCharacter.compareTo(tree[currentNodeIndex].getCharacter()) < 0){
                nextNodeIndex = currentNodeIndex * 2;
             } else {
                nextNodeIndex = (currentNodeIndex * 2) + 1;
@@ -214,6 +218,7 @@ class HuffmanTree
       ** @param searchCharacter A String containing the character we want to find the code for.
       ** @return String A String containing the Huffman code for searchCharacter; if not found, an empty Stringge
       **/
+      searchCharacter = searchCharacter.toUpperCase();
       int currentNode = 1;
       
       while(binaryCodeTree[currentNode] != null && !(currentNode > (binaryCodeTree.length - 1))){
@@ -223,7 +228,7 @@ class HuffmanTree
          }
          
          // Otherwise, determine whether to go left or right down the tree and try again
-         boolean goLeft = searchCharacter.compareTo(binaryCodeTree[currentNode].getCharacter()) == -1;
+         boolean goLeft = searchCharacter.compareTo(binaryCodeTree[currentNode].getCharacter()) < 0;
          currentNode = goLeft? currentNode * 2 : (currentNode * 2) + 1;
       }
       
