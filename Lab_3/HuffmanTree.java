@@ -5,12 +5,13 @@ class HuffmanTree
    private HuffmanNode treeRoot;
    private HuffmanCode[] codes;
    private HuffmanCode[] binaryCodeTree;
+   private boolean richText;
    
    /////////////////////////
    // Constructors
    /////////////////////////
    
-   HuffmanTree(PriorityQueue queue){
+   HuffmanTree(PriorityQueue queue, boolean richText){
       /**
       ** Constructor for HuffmanTree. The HuffmanTree must be initialized with a PriorityQueue
       ** that is seeded with the characters and frequencies to be used in the Huffman
@@ -23,6 +24,7 @@ class HuffmanTree
       buildTree(queue);
       this.codes = generateCodes();
       this.binaryCodeTree = buildSearchTree();
+      this.richText = richText;
       
    }
    
@@ -36,6 +38,20 @@ class HuffmanTree
          String character = data.pop();
          String encodedCharacter = encode(character);
          encodedString += encodedCharacter;
+         
+         // Add richText enhancements
+         if(!encodedCharacter.equals("") && richText){
+            // Add the capiatlization flag
+            encodedString += character.toUpperCase().equals(character) ? "1" : "0";
+            // Check if the next character is a space; if so, add a flag and delete the space
+            if(!data.isEmpty() && data.peek().equals(" ")){
+               encodedString += "1";
+               data.pop();
+            } else{
+               encodedString += "0";
+            }
+         }
+         
       }
       return encodedString;
    }
@@ -51,18 +67,38 @@ class HuffmanTree
       **/
       String decodedString = "";
       while(!codeString.isEmpty()){
+         String decodedCharacter;
          HuffmanNode currentNode = treeRoot;
+         boolean capitalizeCharacter = false;
+         boolean addSpace = false;
+         
          while(!currentNode.isLeaf()){
             try{
                currentNode = codeString.pop().equals("0") ? currentNode.getLeftChild() : currentNode.getRightChild();
             } catch (EmptyStackException except) {
-               EncodingException exception = new EncodingException("The encoded string is invalid--does not match code tree");
-               throw exception;
+               throw new EncodingException("The encoded string is invalid--does not match code tree");
             }
          }
-         decodedString += currentNode.getChars();
-
-         // TODO ADD HANDLING FOR SPACES AND/OR CAPITALIZATION      
+         decodedCharacter = currentNode.getChars();
+         
+         // Make richText adjustments if enabled
+         if(richText){
+            try{
+               capitalizeCharacter = codeString.pop().equals("1") ? true : false;
+               addSpace = codeString.pop().equals("1") ? true : false;
+            } catch (EmptyStackException except){
+               throw new EncodingException("The encoded string is invalid--does not match code tree");
+            }
+            if(!capitalizeCharacter){
+               decodedCharacter = decodedCharacter.toLowerCase();
+            } 
+         }
+         
+         // Append new character to decodedString
+         decodedString += decodedCharacter;
+         if(addSpace){
+            decodedString += " ";
+         }   
       }
       
       return decodedString;
@@ -93,7 +129,7 @@ class HuffmanTree
       **
       ** @return HuffmanCode[] A binary tree of HuffmanCode objects contained in an array.
       **/
-      HuffmanCode[] tree = new HuffmanCode[(int) Math.pow(2, leafNodes.length) + 1];
+      HuffmanCode[] tree = new HuffmanCode[(int) Math.pow(2, leafNodes.length /2 ) + 1];
       int midNode = codes.length / 2;
       tree[1] = codes[midNode];
       for(int i=0; i<codes.length; i++){

@@ -22,9 +22,12 @@ class PriorityQueue
        ** the arithmetic methods of calculating parents and children do not work
        ** with an input index of 0.
        **
+       ** In additio, I've added 20 extra spaces into the heap for any enhancement
+       ** characters added that need to be added to the PriorityQueue
+       **
        ** @param maxQueueSize Integer specifying the maximum number of items in the priority queue.
        **/
-      heap = new HuffmanNode[maxQueueSize + 1];
+      heap = new HuffmanNode[maxQueueSize + 1 + 20];
       heapSize = 0;
    }
    

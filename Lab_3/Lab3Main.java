@@ -12,7 +12,9 @@ class Lab3Main
       File encodingFile;
       File inputFile;
       String outputFile;
-      HuffmanTree tree;
+      HuffmanTree plainTree;
+      HuffmanTree richTree;
+      HuffmanTree currentTree;
       StringStackDataPack[] inputData;
       
       
@@ -29,9 +31,31 @@ class Lab3Main
       inputFile = getInputFile(args);
       outputFile = args[3];
       richText = getRichText(args);
+      
+      // Build the plainTree
+      plainTree = new HuffmanTree(FreqTableHandler.getFrequencies(encodingFile), false);
+      
+      // Build the richTree--Generate the queue, inject punctuation into it, then build the tree
+      PriorityQueue queue = FreqTableHandler.getFrequencies(encodingFile);
+      queue.push(new HuffmanNode(".", 13));
+      queue.push(new HuffmanNode(",", 20));
+      queue.push(new HuffmanNode(";", 7));
+      queue.push(new HuffmanNode(":", 29));
+      queue.push(new HuffmanNode("-", 3));
+      queue.push(new HuffmanNode("/", 11));
+      queue.push(new HuffmanNode("\\", 7));
+      queue.push(new HuffmanNode("(", 4));
+      queue.push(new HuffmanNode(")", 27));
+      queue.push(new HuffmanNode("[", 18));
+      queue.push(new HuffmanNode("]", 21));
+      queue.push(new HuffmanNode("{", 7));
+      queue.push(new HuffmanNode("}", 9));
+      queue.push(new HuffmanNode("?", 13));
+      queue.push(new HuffmanNode("!", 16));
+      queue.push(new HuffmanNode("'", 22));
 
       // Build Huffman tree
-      tree = new HuffmanTree(FreqTableHandler.getFrequencies(encodingFile));
+      richTree = new HuffmanTree(queue, true);
       // Get data from input file
       inputData = InputFileHandler.getLinesFromFileAsStacks(inputFile);
      
@@ -47,6 +71,7 @@ class Lab3Main
             richText = data.turnRichTextOn() ? true : richText;
             richText = data.turnRichTextOff() ? false : richText;
             
+            currentTree = richText ? richTree : plainTree;
             
             // Setup variables and output boilerplate
             StringStack inputDataStack = data.stack;
@@ -61,14 +86,14 @@ class Lab3Main
             // Encode the input file
             if(mode.equals("encode")){
                try{
-                  String encodedString = tree.encodeString(inputDataStack);
+                  String encodedString = currentTree.encodeString(inputDataStack);
                   int rawSize = inputString.getBytes("UTF-8").length;
                   double compressedSize = encodedString.length() / 8.0;
                   
                   outputWriter.write("Original size: " + inputString.length() + " characters (" + rawSize + " bytes using UTF-8)\n");
                   outputWriter.write("Encoded size: " + encodedString.length() + " bits (" + compressedSize + " bytes)\n");
                   outputWriter.write("Compression: " + (compressedSize / rawSize * 100) + "%\n");
-                  outputWriter.write("\nPreorder traversal: " + tree.getPreorderTraversal() + "\n");
+                  outputWriter.write("\nPreorder traversal: " + currentTree.getPreorderTraversal() + "\n");
                   outputWriter.write("\nEncoded string: " + encodedString + "\n\n\n");
                } catch (EncodingException except){
                   outputWriter.write("Error during encoding: " + except.getMessage() + "\n");
@@ -77,13 +102,13 @@ class Lab3Main
             // Or decode the input file
             else{
                try{
-                  String decodedString = tree.decode(inputDataStack);
+                  String decodedString = currentTree.decode(inputDataStack);
                   int rawSize = decodedString.getBytes("UTF-8").length;
                   double compressedSize = inputString.length() / 8.0;
                   outputWriter.write("Encoded size: " + inputString.length() + " bits (" + compressedSize + " bytes)\n");
                   outputWriter.write("Decoded size: " + decodedString.length() + " characters (" + rawSize + " bytes)\n");
                   outputWriter.write("Compression: " + (compressedSize / rawSize * 100) + "%\n");
-                  outputWriter.write("\nPreorder traversal: " + tree.getPreorderTraversal() + "\n");
+                  outputWriter.write("\nPreorder traversal: " + currentTree.getPreorderTraversal() + "\n");
                   outputWriter.write("\nDecoded string: " + decodedString +"\n\n\n");
                } catch (EncodingException except){
                   outputWriter.write("Error during decoding: " + except.getMessage() + "\n");
