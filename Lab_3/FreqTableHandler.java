@@ -218,6 +218,22 @@ class FreqTableHandler
          System.out.println("Please check that the file exists, that it contains data, and that you have access to it. Try again.");
       }
       
+      // Very inefficient check that there aren't duplicate entries in the frequency table:
+      for(int i=0; i<codes.length; i++){
+         if(codes[i]==null) continue;
+         
+         String currentCharacter = codes[i].getChars();
+         // Check currentCharacter against every other character in the codes array
+         for(int j=0; j<codes.length; j++){
+            // Skip the we're checking
+            if(j==i || codes[j]==null) continue;
+            if(codes[j].getChars().equals(currentCharacter)){
+               throw new EncodingException("Frequency table may not contain multiple entries: Found multiple entries for " + currentCharacter);
+            }
+         }
+      
+      }
+      
       // A file consisting only of comments would result in an array of null HuffmanNodes. 
       // If all are null, return an empty array.
       for(HuffmanNode node : codes){

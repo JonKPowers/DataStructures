@@ -12,10 +12,11 @@ class Lab3Main
       File encodingFile;
       File inputFile;
       String outputFile;
-      HuffmanTree plainTree;
-      HuffmanTree richTree;
+      HuffmanTree plainTree = null;
+      HuffmanTree richTree = null;
       HuffmanTree currentTree;
       StringStackDataPack[] inputData;
+      PriorityQueue queue = null;
       
       
       // Check that we have the right number of arguments
@@ -33,10 +34,20 @@ class Lab3Main
       richText = getRichText(args);
       
       // Build the plainTree
-      plainTree = new HuffmanTree(FreqTableHandler.getFrequencies(encodingFile), false);
+      try{
+         plainTree = new HuffmanTree(FreqTableHandler.getFrequencies(encodingFile), false);
+      } catch(EncodingException except) {
+         System.out.println(except.getMessage() + "\n");
+         printUsageAndQuit();
+      }
       
       // Build the richTree--Generate the queue, inject punctuation into it, then build the tree
-      PriorityQueue queue = FreqTableHandler.getFrequencies(encodingFile);
+      try{
+         queue = FreqTableHandler.getFrequencies(encodingFile);
+      } catch(EncodingException except) {
+         System.out.println(except.getMessage() + "\n");
+         printUsageAndQuit();
+      }
       queue.push(new HuffmanNode(".", 13));
       queue.push(new HuffmanNode(",", 20));
       queue.push(new HuffmanNode(";", 7));
@@ -96,7 +107,7 @@ class Lab3Main
                   outputWriter.write("\nPreorder traversal: " + currentTree.getPreorderTraversal() + "\n");
                   outputWriter.write("\nEncoded string: " + encodedString + "\n\n\n");
                } catch (EncodingException except){
-                  outputWriter.write("Error during encoding: " + except.getMessage() + "\n");
+                  outputWriter.write("Error during encoding: " + except.getMessage() + "\n\n\n");
                }
             }
             // Or decode the input file
@@ -111,7 +122,7 @@ class Lab3Main
                   outputWriter.write("\nPreorder traversal: " + currentTree.getPreorderTraversal() + "\n");
                   outputWriter.write("\nDecoded string: " + decodedString +"\n\n\n");
                } catch (EncodingException except){
-                  outputWriter.write("Error during decoding: " + except.getMessage() + "\n");
+                  outputWriter.write("Error during decoding: " + except.getMessage() + "\n\n\n");
                }
             }
             
