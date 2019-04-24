@@ -1,5 +1,11 @@
 class HuffmanNode
 {
+   /**
+   ** The HuffmanNode class provides units to represent nodes in a HuffmanTree.
+   **
+   ** @author Jon Powers
+   ** @version 0.1
+   **/
 
    private int frequency;
    private String characters;
@@ -10,6 +16,14 @@ class HuffmanNode
    private HuffmanNode rightChild;
 
    HuffmanNode(String characters, int frequency){
+      /**
+      ** Constructor for a HuffmanNode. This constructor provides a simple leaf node,
+      ** which initializes the characters and frequency fields of the HuffmanNode, and 
+      ** leaves the remaining attributes null.
+      **
+      ** @param characters The character(s) represented by the HuffmanNode
+      ** @param frequency The frequency associated with the character
+      **/
       this.frequency = frequency;
       this.characters = characters;
       this.multiChar = characters.length() > 1;
@@ -20,6 +34,15 @@ class HuffmanNode
    }
    
    HuffmanNode(HuffmanNode leftChild, HuffmanNode rightChild){
+      /**
+      ** Constructor for a HuffmanNode. This constructor is intended for use when
+      ** initializing new parent nodes. The child nodes are passed in, and they are
+      ** modified along with the parent's attributes to cement the relationship
+      ** between the nodes.
+      **
+      ** @param leftChild This HuffmanNode's left child
+      ** @param rightChild This HuffmanNode's right child
+      **/
       this.frequency = leftChild.getFrequency() + rightChild.getFrequency();
       this.characters = leftChild.getChars() + rightChild.getChars();
       this.multiChar = characters.length() > 1;
@@ -31,21 +54,16 @@ class HuffmanNode
       rightChild.setParent(this);
       this.rightChild = rightChild;
    }
-
+   
+   /////////////////////////
+   // Getters and setters
+   /////////////////////////
    public int getFrequency(){
       return this.frequency;
    }
 
    public String getChars(){
       return this.characters;   
-   }
-
-   public boolean isMultiChar(){
-      return this.multiChar;
-   }
-   
-   public boolean isLeaf(){
-      return this.leftChild == null && this.rightChild==null;
    }
    
    public HuffmanNode getParent(){
@@ -68,7 +86,35 @@ class HuffmanNode
       this.isLeftChild = isLeftChild;
    }
    
+   /////////////////////////
+   // State checkers
+   /////////////////////////
+   
+   public boolean isMultiChar(){
+      /**
+      ** isMultiChar() determines whether this HuffmanNode represents multiple characters.
+      ** This can be used to determine whether it is a leaf node on the HuffmanTree.
+      **
+      ** @return boolean True if the HuffmanNode represents multiple characters; otherwise, false
+      **/
+      return this.multiChar;
+   }
+   
+   public boolean isLeaf(){
+      /**
+      ** isLeaf() determines whether this HuffmanNode is a leaf on the Huffman tree
+      **
+      ** @return boolean True if the HuffmanNode is a leag node; otherwise, false
+      **/
+      return this.leftChild == null && this.rightChild==null;
+   }
+   
    public boolean isLeft(){
+      /**
+      ** isLeft() determines whether this HuffmanNode is the left child of its parent node (if any).
+      **
+      ** @return boolean True if the HuffmanNode is a left child of another node; otherwise, false
+      **/
       return this.isLeftChild;
    }
 
@@ -98,6 +144,11 @@ class HuffmanNode
    }
 
    public String toString(){
+      /**
+      ** toString() generates a simple String representation of the HuffmanNode
+      ** 
+      ** @return String A String representation of the HuffmanNode
+      **/
       String output = "Huffman Node:";
       output += "\n\tCharacter: " + this.characters;
       output += "\n\tFrequency: " + this.frequency;
