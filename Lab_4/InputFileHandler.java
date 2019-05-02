@@ -72,14 +72,12 @@ class InputFileHandler
       ** @return int[] Integer array containing the integer entries in the input file
       **/
 
-      HuffmanNode[] codes = new HuffmanNode[getNumLines(fileName)];
+      IntStack stack = new IntStack();
 
-      
       try(FileReader file = new FileReader(fileName)){
          int character;
          String stringNum = "";
          int num = 0;
-         IntStack stack = new IntStack();
          
          while((character = file.read()) != -1){
             // Ignore anything that's not a number
@@ -107,6 +105,6 @@ class InputFileHandler
       }
       
       // Dump the stack to an array and return it
-      return stack.dumpArray();
-
+      return stack.dumpStack();
+   }
 }

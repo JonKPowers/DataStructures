@@ -31,9 +31,9 @@ class IntStack
       top = -1;
    }
    
-   //
+   ////////////////////
    // Public methods
-   //
+   ////////////////////
    
    public boolean isEmpty(){
       /**
@@ -123,6 +123,21 @@ class IntStack
       }
       return stackString;
    }
+
+   public int[] dumpStack(){
+      /**
+       ** dumpStack() returns an array containing the elements currently in the stack.
+       **
+       ** @return int[] An integer array with the current contents of the array
+       **
+       **/
+      int[] outputStack = new int[top+1];
+      for(int i=0; i<=top; i++){
+         outputStack[i] = stack[i];
+      }
+      return outputStack;
+
+   }
    
    public IntStack copy(){
       /**
@@ -150,9 +165,9 @@ class IntStack
       }
    }
    
-   //
+   ////////////////////
    // Private methods
-   //
+   ////////////////////
    
    private boolean isFull(){
       /**
