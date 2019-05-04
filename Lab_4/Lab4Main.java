@@ -197,22 +197,5 @@ class Lab4Main
       }
 
    }
-
-   private static Timer runQSort(int numRuns, int[] array, int stopSize, int mode, String outputPrefix){
-      Timer timer = new Timer(numRuns);
-      int[] arrayCopy = copy(array);
-
-      for(int i=0; i<numRuns; i++){
-         arrayCopy = copy(array);
-         timer.start();
-         Sorter.qSort(arrayCopy, stopSize, mode);
-         timer.stop();
-      }
-
-      saveToFile(getOutputFile(outputPrefix, stopSize, mode), arrayCopy);
-      return timer;
-   } 
-
-
 }
 

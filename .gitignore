@@ -8,3 +8,4 @@ output.txt
 *.swp
 output*.txt
 *.txt
+*.dat
