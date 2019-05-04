@@ -3,6 +3,50 @@ import java.util.Random;
 class Sorter
 {
 
+   public static void iQSort(int[] array, int stopSize, int mode){
+      iQSort(array, 0, array.length - 1, stopSize, mode);
+   }
+
+   public static void iQSort(int[] array, int startIndex, int stopIndex, int stopSize, int mode){
+      // Set up stack
+      IntStack stack = new IntStack();
+      stack.push(startIndex);
+      stack.push(stopIndex);
+
+      // Simulate recursion until stack is empty
+      while(!stack.isEmpty()){
+         int pivot;
+         int sortSort;
+         int sortSize;
+         stopIndex = stack.pop();
+         startIndex = stack.pop();
+         sortSize = stopIndex - startIndex;
+
+         // Stopping cases
+         // If start and end indices have met or crossed, always continue
+         if(sortSize <= 0){
+            continue;
+         // If size of subarray to sort <= stopSize, finish with Insertion Sort
+         } else if (sortSize <= stopSize) {
+            iSort(array, startIndex, stopIndex);
+            continue;
+         }
+
+         // Partition the subarray
+         pivot = partition(array, startIndex, stopIndex, mode);
+
+         // Push the partition indicies onto the stack; pivot is already in correct position
+         // Left subarray
+         stack.push(startIndex);
+         stack.push(pivot - 1);
+         // Right subarray
+         stack.push(pivot + 1);
+         stack.push(stopIndex);
+      }
+
+
+   }
+
    public static void qSort(int[] array, int stopSize, int mode){
       qSort(array, 0, array.length - 1, stopSize, mode);
    }
@@ -18,13 +62,6 @@ class Sorter
          return;
       }
 
-
-      // Base case 1: Quicksort the whole way. end <= start
-      if(endIndex <= startIndex){
-         return;   
-      }
-      // Base case 2: Insert sort once subarray size <= _______
-      // TO DO
 
       // The partitioning process positions the pivot
       int pivot = partition(array, startIndex, endIndex, mode);
@@ -99,13 +136,15 @@ class Sorter
          case 2:
             return array[(startIndex + endIndex) / 2];
          case 3:
-            Random random = new Random();
             int[] threes = {array[startIndex], array[(startIndex + endIndex) /2], array[endIndex]}; 
             iSort(threes);
             return threes[1];
          case 4:
+            Random random = new Random();
             int span = endIndex - startIndex + 1;
             return array[random.nextInt(span) + startIndex];
+         default:
+            return array[startIndex];
       }
    }
 
