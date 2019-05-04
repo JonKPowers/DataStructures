@@ -2,8 +2,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
 
 class Benchmarker
 {
@@ -17,9 +15,14 @@ class Benchmarker
       String timingData = "";
       int[] array;
       int[] arrayCopy;
+      // Input variables
       File inputDir;
       File[] inputFiles;
-      String outputFileName = "";
+      // Output file names, one each for sorted, reversed, random and duplicates files
+      File outputFileAsc = new File("Dummy");
+      File outputFileRev = new File("Dummy");
+      File outputFileRan = new File("Dummy");
+      File outputFileDup = new File("Dummy");
 
       // qTest Variables 
       // Defaults are a single pure QuickSort run with first-item pivot
@@ -52,17 +55,25 @@ class Benchmarker
             printUsageAndQuit("Incorrect number of arguments provided: " + args.length + ". Check usage and try again");
          }
          
-         numRuns = Integer.parseInt(args[1]);
-         maxK = Integer.parseInt(args[2]);
+         try{
+            numRuns = Integer.parseInt(args[1]);
+         } catch (NumberFormatException except) {
+            printUsageAndQuit("Invalid number of runs: " + numRuns + ". Please check usage and try again.");
+         }
+         try{
+            maxK = Integer.parseInt(args[2]);
+         } catch (NumberFormatException except) {
+            printUsageAndQuit("Invalid max_k value: " + maxK + ". Please check usage and try again.");
+         }
+
          mode = getMode(args[3]);
          useRecursive = args.length == 5 && args[4].toLowerCase().equals("recursive");
 
-         // Generate output file name
-         outputFileName += "QSort_";
-         outputFileName += args[3] + "_";
-         outputFileName += "n" + numRuns + "_";
-         outputFileName += "k" + maxK;
-         outputFileName += ".csv";
+         outputFileAsc = getOutputFile("sorted", args[3],  numRuns, maxK);
+         outputFileRev = getOutputFile("reversed", args[3],  numRuns, maxK);
+         outputFileRan = getOutputFile("random", args[3],  numRuns, maxK);
+         outputFileDup = getOutputFile("duplicates", args[3],  numRuns, maxK);
+
       }
 
 
@@ -91,25 +102,49 @@ class Benchmarker
       /////////////////////////
 
       if(testType.equals("qtest")){
-         // Generate CSV headers
-         timingData += "n,";
-         for(int i=1; i<=maxK; i++){
-            timingData += "k=" + i + ",";
-         }
-         timingData = timingData.replaceAll(",$", "");
-         timingData += "\n";
+         // Set up context manager for output files
+         try(FileWriter outputAsc = new FileWriter(outputFileAsc);
+             FileWriter outputRev = new FileWriter(outputFileRev);
+             FileWriter outputRan = new FileWriter(outputFileRan);
+             FileWriter outputDup = new FileWriter(outputFileDup)){
+         
+            // Add header information for CSV files
+            addCsvHeaders(outputAsc, maxK);
+            addCsvHeaders(outputRev, maxK);
+            addCsvHeaders(outputRan, maxK);
+            addCsvHeaders(outputDup, maxK);
 
-         // Run timing benchmarks
-         for(File file : inputFiles){
-            timingData += qTest(file, numRuns, maxK, mode, useRecursive);
-            timingData += "\n";
-         }
+            // Run timing benchmarks
+            for(File file : inputFiles){
+               // Get type of file
+               String fileType = file.getName().toLowerCase().substring(0,3);
 
-         // Write out CSV data to file
-         try(FileWriter outputFile = new FileWriter(outputFileName)){
-            outputFile.write(timingData);
+               // Get timing data
+               timingData = "";
+               timingData += qTest(file, numRuns, maxK, mode, useRecursive);
+               timingData += "\n";
+
+               // Write timing data to appropriate file
+               switch(fileType){
+                  case "asc":
+                     outputAsc.write(timingData);
+                     break;
+                  case "rev":
+                     outputRev.write(timingData);
+                     break;
+                  case "ran":
+                     outputRan.write(timingData);
+                     break;
+                  case "dup":
+                     outputDup.write(timingData);
+                     break;
+                  default:
+                     // Unsupported filename format--do nothing
+                     System.out.println("Warning: unsupported filename format " + file.getName());
+               }
+            }
          } catch (IOException except) {
-            printUsageAndQuit("Error writing output file. Please check settings and try again.");
+            printUsageAndQuit("Error writing output file(s). Please check settings and try again.");
          }
 
       }
@@ -156,34 +191,26 @@ class Benchmarker
       String outputData = "";
       outputData += array.length + ",";
 
-      if(useRecursive){
-         try {
-            for(int k=1; k<=maxK; k++){
-               for(int i=0; i<numRuns; i++){
-                  arrayCopy = copy(array);
+      try {
+         for(int k=1; k<=maxK; k++){
+            for(int i=0; i<numRuns; i++){
+               arrayCopy = copy(array);
+               if(useRecursive){
                   timer.start();
                   Sorter.qSort(arrayCopy, k, mode);
+                  timer.stop();
+               } else {
+                  timer.start();
+                  Sorter.iQSort(arrayCopy, k, mode);
                   timer.stop();
                }
             }
             outputData += timer.getAverageTime() + ",";
             timer.reset();
-         } catch (StackOverflowError except) {
-            printUsageAndQuit("Sorry, recursive depth too high for stack; can't complete requested operation");
          }
-      } else {
-         for(int k=1; k<=maxK; k++){
-            for(int i=0; i<numRuns; i++){
-               arrayCopy = copy(array);
-               timer.start();
-               Sorter.iQSort(arrayCopy, k, mode);
-               timer.stop();
-            }
-            outputData += timer.getAverageTime() + ",";
-            timer.reset();
-         }
+      } catch (StackOverflowError except) {
+         printUsageAndQuit("Sorry, recursive depth too high for stack; can't complete requested operation");
       }
-      
       return outputData.replaceAll(",$", "");
    }
 
@@ -232,8 +259,41 @@ class Benchmarker
       return output;
    }
 
-   private static File getOutputFile(String outputPrefix){
-      return new File(outputPrefix + "HeapSort.txt");
+   private static File getOutputFile(String fileType, int numRuns){
+      String fileName = "output/output_";
+      fileName += "HSort_";
+      fileName += fileType + "_";
+      fileName += "n" + numRuns;
+      fileName += ".csv";
+      return new File(fileName);
+   }
+
+   private static File getOutputFile(String fileType, String pivot, int numRuns, int maxK){
+      String fileName= "output_";
+      fileName+= "QSort_";
+      fileName+= fileType + "_";
+      fileName+= pivot + "_";
+      fileName+= "n" + numRuns + "_";
+      fileName+= "k" + maxK;
+      fileName+= ".csv";
+      return new File(fileName);
+   }
+
+   private static void addCsvHeaders(FileWriter file, int maxK){
+      // Generate CSV headers
+      String timingData = "n,";
+      for(int i=1; i<=maxK; i++){
+         timingData += "k=" + i + ",";
+      }
+      timingData = timingData.replaceAll(",$", "");
+      timingData += "\n";
+      
+      // Write out to file
+      try{
+         file.write(timingData);
+      } catch (IOException except) {
+         printUsageAndQuit("There was a proble writing to output file(s). Please check and try again.");
+      }
    }
 }
 
