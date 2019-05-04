@@ -192,7 +192,7 @@ class Benchmarker
       outputData += array.length + ",";
 
       try {
-         for(int k=1; k<=maxK; k++){
+         for(int k=1; k<=maxK; k += 5){
             for(int i=0; i<numRuns; i++){
                arrayCopy = copy(array);
                if(useRecursive){
@@ -262,19 +262,19 @@ class Benchmarker
    private static File getOutputFile(String fileType, int numRuns){
       String fileName = "output/output_";
       fileName += "HSort_";
-      fileName += fileType + "_";
-      fileName += "n" + numRuns;
+      fileName += "n" + numRuns + "_";
+      fileName += fileType;
       fileName += ".csv";
       return new File(fileName);
    }
 
    private static File getOutputFile(String fileType, String pivot, int numRuns, int maxK){
-      String fileName= "output_";
+      String fileName= "output/output_";
       fileName+= "QSort_";
-      fileName+= fileType + "_";
-      fileName+= pivot + "_";
       fileName+= "n" + numRuns + "_";
-      fileName+= "k" + maxK;
+      fileName+= "k" + maxK + "_";
+      fileName+= pivot + "_";
+      fileName+= fileType;
       fileName+= ".csv";
       return new File(fileName);
    }
@@ -282,7 +282,7 @@ class Benchmarker
    private static void addCsvHeaders(FileWriter file, int maxK){
       // Generate CSV headers
       String timingData = "n,";
-      for(int i=1; i<=maxK; i++){
+      for(int i=1; i<=maxK; i += 5){
          timingData += "k=" + i + ",";
       }
       timingData = timingData.replaceAll(",$", "");

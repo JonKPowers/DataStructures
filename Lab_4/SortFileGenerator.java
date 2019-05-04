@@ -10,7 +10,7 @@ class SortFileGenerator
 {
 
    public static void main( String[] args ){
-      for(int i=50; i<1000000; i = i*2){
+      for(int i=50; i<100000; i += 50){
          makeSortedFile(i);
          makeReversedFile(i);
          makeRandomFile(i);
