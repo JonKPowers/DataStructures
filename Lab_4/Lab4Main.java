@@ -18,6 +18,12 @@ class Lab4Main
       int[] arrayCopy;
       Timer timer = new Timer(1);
 
+      // Check that minimum number of arguments were passed:
+      if(args.length < 1){
+         System.out.println("Not enough arguments were passed. Check usage and try again.");
+         printUsageAndQuit();
+      }
+
       // Set up configuration variables from argument list
       // Input file name and stem
       inputFile = getInputFile(args);
@@ -104,9 +110,10 @@ class Lab4Main
       ** @return None Nothing is returned.
       **/
       String usageString = "";
-      usageString += "Usage: Lab4Main input_file [output_prefix]\n";
+      usageString += "Usage: Lab4Main input_file [output_prefix] [verbose]\n";
       usageString += "\tinput_file: The file containing integers to be sorted\n";
       usageString += "\toutput_prefix: Optional. Prefix to prepend to output files; defaults to \"output\"\n";
+      usageString += "\tverbose: Optional. If \"verbose\" is passed, print timing stats to console\n";
    
       System.out.println(usageString);
       System.exit(0); 

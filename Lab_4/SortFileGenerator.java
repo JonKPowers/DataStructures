@@ -10,7 +10,7 @@ class SortFileGenerator
 {
 
    public static void main( String[] args ){
-      for(int i=50; i<100000; i += 50){
+      for(int i=50; i<220000; i += 200){
          makeSortedFile(i);
          makeReversedFile(i);
          makeRandomFile(i);
@@ -126,7 +126,7 @@ class SortFileGenerator
       fileName += n + "_";
       fileName += new SimpleDateFormat("mmssSSS").format(new Date());
       fileName += ".dat";
-      return new File("inputFiles/" + fileName);
+      return new File("inputFiles/newerer/" + fileName);
    }
 
    private static File getOutputFile(String type, int n, double ratio){
@@ -136,7 +136,7 @@ class SortFileGenerator
       fileName += n + "_";
       fileName += new SimpleDateFormat("mmssSSS").format(new Date());
       fileName += ".dat";
-      return new File("inputFiles/" + fileName);
+      return new File("inputFiles/newerer/" + fileName);
    }
 
 }

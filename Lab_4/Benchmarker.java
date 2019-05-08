@@ -44,7 +44,7 @@ class Benchmarker
       testType = args[0].toLowerCase();
 
       // Validate selected valid test
-      if(!testType.equals("qtest")){
+      if(!testType.equals("qtest") && !testType.equals("htest")){
          printUsageAndQuit("Invalid test selection. Check usage and try again");
       }
       
@@ -58,7 +58,7 @@ class Benchmarker
          try{
             numRuns = Integer.parseInt(args[1]);
          } catch (NumberFormatException except) {
-            printUsageAndQuit("Invalid number of runs: " + numRuns + ". Please check usage and try again.");
+            printUsageAndQuit("Invalid number of runs: " + args[1] + ". Please check usage and try again.");
          }
          try{
             maxK = Integer.parseInt(args[2]);
@@ -77,12 +77,30 @@ class Benchmarker
       }
 
 
+      if(testType.equals("htest")){
+         if(args.length != 2){
+            printUsageAndQuit("Incorrect number of arguments provided: " + args.length + ". Please check usage and try again.");
+         }
+
+         try{
+            numRuns = Integer.parseInt(args[1]);
+         } catch (NumberFormatException except) {
+            printUsageAndQuit("Invalid number of runs: " + args[1] + ". Please check usage and try again.");
+         }
+
+         outputFileAsc = getOutputFile("sorted",  numRuns);
+         outputFileRev = getOutputFile("reversed",  numRuns);
+         outputFileRan = getOutputFile("random",  numRuns);
+         outputFileDup = getOutputFile("duplicates",  numRuns);
+      }
+
+
       /////////////////////////
       // Input File Handling
       /////////////////////////
 
       // Check for input file directory and contents; generate list of input files
-      inputDir = new File("inputFiles");
+      inputDir = new File("inputFiles/newer");
       if(!inputDir.exists()){
          printUsageAndQuit("Error: Could not find directory ./inputFiles containing input files");
       }
@@ -100,6 +118,43 @@ class Benchmarker
       /////////////////////////
       // Fire up the test runner
       /////////////////////////
+
+      if(testType.equals("htest")){
+         try(FileWriter outputAsc = new FileWriter(outputFileAsc);
+             FileWriter outputRev = new FileWriter(outputFileRev);
+             FileWriter outputRan = new FileWriter(outputFileRan);
+             FileWriter outputDup = new FileWriter(outputFileDup)){
+
+            for(File file : inputFiles){
+               // Get type of file
+               String fileType = file.getName().toLowerCase().substring(0,3);
+               // Run sort--Get timing data
+               timingData = hTest(file, numRuns);
+               
+               // Write timing data to appropriate file
+               switch(fileType){
+                  case "asc":
+                     outputAsc.write(timingData);
+                     break;
+                  case "rev":
+                     outputRev.write(timingData);
+                     break;
+                  case "ran":
+                     outputRan.write(timingData);
+                     break;
+                  case "dup":
+                     outputDup.write(timingData);
+                     break;
+                  default:
+                     // Unsupported filename format--do nothing
+                     System.out.println("Warning: unsupported filename format " + file.getName());
+               }
+
+            } 
+         } catch (IOException except){
+            printUsageAndQuit("Error writing output file(s). Please check settings and try again.");
+         }
+      }
 
       if(testType.equals("qtest")){
          // Set up context manager for output files
@@ -192,7 +247,7 @@ class Benchmarker
       outputData += array.length + ",";
 
       try {
-         for(int k=1; k<=maxK; k += 5){
+         for(int k=0; k<=maxK; k += 50){
             for(int i=0; i<numRuns; i++){
                arrayCopy = copy(array);
                if(useRecursive){
@@ -212,6 +267,24 @@ class Benchmarker
          printUsageAndQuit("Sorry, recursive depth too high for stack; can't complete requested operation");
       }
       return outputData.replaceAll(",$", "");
+   }
+
+   // hTest
+   private static String hTest(File file, int numRuns){
+      String output = "";
+      Timer timer = new Timer(numRuns);
+      HeapSorter sorter = new HeapSorter(timer);
+      int[] array = InputFileHandler.parseFile(file);
+      int[] arrayCopy;
+
+      for(int i=0; i<numRuns; i++){
+         arrayCopy = copy(array);
+         sorter.sort(arrayCopy);
+      }
+      
+      output += array.length + ",";
+      output += timer.getAverageTime() + "\n";
+      return output;
    }
 
    /////////////////////////
@@ -260,7 +333,7 @@ class Benchmarker
    }
 
    private static File getOutputFile(String fileType, int numRuns){
-      String fileName = "output/output_";
+      String fileName = "output/";
       fileName += "HSort_";
       fileName += "n" + numRuns + "_";
       fileName += fileType;
@@ -269,7 +342,7 @@ class Benchmarker
    }
 
    private static File getOutputFile(String fileType, String pivot, int numRuns, int maxK){
-      String fileName= "output/output_";
+      String fileName= "output/50to200000/";
       fileName+= "QSort_";
       fileName+= "n" + numRuns + "_";
       fileName+= "k" + maxK + "_";
@@ -282,7 +355,7 @@ class Benchmarker
    private static void addCsvHeaders(FileWriter file, int maxK){
       // Generate CSV headers
       String timingData = "n,";
-      for(int i=1; i<=maxK; i += 5){
+      for(int i=0; i<=maxK; i += 50){
          timingData += "k=" + i + ",";
       }
       timingData = timingData.replaceAll(",$", "");
